@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { Role } from '../../../../auth/enums/role.enum';
 import { UserStatus } from '../../enums/user-status.enum';
-import * as bcrypt from 'bcrypt';
+import { genSaltSync, hashSync }from 'bcrypt';
 import { MongooseMiddlewareHelper } from '../../../../global/helper/mongoose_middleware.helper';
 export type UserDocument = HydratedDocument<User>;
 
@@ -30,8 +30,11 @@ export class User {
   lastName: string;
   @Prop({})
   otpCode: string;
+
   @Prop({ type: Date, })
   dateOfBirth: Date;
+  @Prop({ type: String, unique: true, required: true})
+  phone: string;
 
   @Prop({ type: String, enum: Role, default: Role.User })
   type: Role;
@@ -44,8 +47,8 @@ export class User {
 
 export const UserSchema = SchemaFactory.createForClass(User);
 UserSchema.pre("save", function (next) {
-  var salts = bcrypt.genSaltSync(1024);
-  this.password = bcrypt.hashSync(this.password, salts);
+  var salts = genSaltSync(1024);
+  this.password = hashSync(this.password, salts);
   next();
 });
 MongooseMiddlewareHelper.setupMappingMiddlewares(UserSchema);

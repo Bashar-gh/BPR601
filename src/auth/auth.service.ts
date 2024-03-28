@@ -14,6 +14,7 @@ import { StatusDTO } from 'src/global/models/dtos/status.dto';
 import { IncorrectUserCredentials } from './errors/incorrect_credentials.error';
 import { UserAlreadyExists } from './errors/user_already_exists.error';
 import { IncorrectOtpCode } from './errors/incorrect_otp_code.error';
+import NotFound from 'src/global/errors/not_found.error';
 type LoginUserParams = SignInReqDTO & { user: User };
 @Injectable()
 export class AuthService {
@@ -21,7 +22,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private mailerService: EmailingService
-    ) { }
+  ) { }
 
   async signIn(signInDTO: SignInReqDTO, deviceId: string): Promise<SignInResDTO> {
 
@@ -33,7 +34,7 @@ export class AuthService {
     if (!compareSync(signInDTO.password, user.password)) {
       throw new IncorrectUserCredentials();
     }
-    return this._loginUser({ user: user, ...signInDTO}, false);
+    return this._loginUser({ user: user, ...signInDTO }, false);
 
   }
   async signUp(signUpDTO: SignUpReqDTO, deviceId: string): Promise<SignInResDTO> {
@@ -54,12 +55,31 @@ export class AuthService {
     return this._loginUser({ user: user, ...signUpDTO }, true);
 
   }
-  async verifEmail(userId: string, code: string): Promise<{ status: boolean }> {
+  async verifEmail(userId: string, code: string): Promise<StatusDTO> {
     const user = await this.usersService.findById(userId);
+    if (user.otpCode == undefined) return { Status: false };
     if (code.trim().normalize() != user.otpCode.trim().normalize()) throw new IncorrectOtpCode();
     await this.usersService.makeEmailVerified(userId);
-    return { status: true };
+    return { Status: true };
 
+  }
+  async requestPasswordReset(email: string): Promise<StatusDTO> {
+    const users = await this.usersService.findByEmail(email);
+    if (users.length == 0) {
+      throw new NotFound(User);
+    }
+    let code = this.generateOTPCode();
+    await this.usersService.updateById(users[0].id, { otpCode: code });
+    await this.mailerService.sendUserConfirmation(users[0], code);
+    return { Status: true };
+
+  }
+  async resetPassword(userId: string, code: string,password:string): Promise<StatusDTO> {
+    const user = await this.usersService.findById(userId);
+    if (user.otpCode == undefined) return { Status: false };
+    if (code.trim().normalize() != user.otpCode.trim().normalize()) throw new IncorrectOtpCode();
+    await this.usersService.setPassword(userId,password);
+    return { Status: true };
   }
 
   async resendOTPCode(userId: string) {

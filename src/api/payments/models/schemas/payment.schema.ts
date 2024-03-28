@@ -1,16 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
-import { ReservationDocument } from '../../../reservations/models/schemas/reservation.schema';
+import { Document, Types } from 'mongoose';
+import { Reservation, ReservationDocument } from '../../../reservations/models/schemas/reservation.schema';
+import { MongooseMiddlewareHelper } from 'src/global/helper/mongoose_middleware.helper';
 
 export type PaymentDocument = Payment & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Payment {
   @Prop({ required: true })
   amount: number;
-
-  @Prop({ required: true })
-  paymentDate: Date;
 
   @Prop({ required: true })
   paymentMethod: string;
@@ -18,9 +16,11 @@ export class Payment {
   @Prop({ required: true })
   transactionId: string;
 
-  @Prop({ type: 'ObjectId', ref: 'Reservation', required: true })
-  reservationId: ReservationDocument;
+  @Prop({ type: Types.ObjectId, ref: Reservation.name, required: true })
+  reservationId: Types.ObjectId | Reservation;
 
 }
 
 export const PaymentSchema = SchemaFactory.createForClass(Payment);
+
+MongooseMiddlewareHelper.setupMappingMiddlewares(PaymentSchema);

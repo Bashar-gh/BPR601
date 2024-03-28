@@ -37,6 +37,14 @@ export class AuthController {
   async verifyEmail(@Param("id") id: string, @Query("code") code: string) {
     return await this.authService.verifEmail(id, code);
   }
+  @Get('reqPasswordReset')
+  async reqPasswordReset(@Query("email") email: string, @Query("code") code: string) {
+    return await this.authService.requestPasswordReset(email);
+  }
+  @Post('resetPassword/:id')
+  async resetPassword(@Param("id") id: string, @Query("code") code: string,@Body("password")password:string) {
+    return await this.authService.resetPassword(id,code,password);
+  }
   
 
 

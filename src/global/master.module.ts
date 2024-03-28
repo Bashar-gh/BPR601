@@ -8,19 +8,18 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
     imports: [
         MailerModule.forRootAsync({
             inject: [ConfigModule],
-            useFactory: (configService: ConfigService)=>{
+            useFactory: (configService: ConfigService) => {
                 return {
                     transport: {
-                        host: "smtp.gmail.com",
+                        host: configService.get("HOST"),
                         secure: false,
                         auth: {
                             user: configService.get("EMAIL"),
                             pass: configService.get("PASSWORD"),
                         },
-
                     },
                     defaults: {
-                        from: `"No Reply" <$noreply@reserver.com>`,
+                        from: configService.get("FROM"),
                     },
                 };
             }

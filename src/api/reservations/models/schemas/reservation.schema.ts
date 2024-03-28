@@ -1,30 +1,37 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
-import { UserDocument } from '../../../users/models/schemas/user.schema';
-import { LocationDocument } from '../../../locations/models/schemas/location.schema';
+import { Document, Types } from 'mongoose';
+import { User } from '../../../users/models/schemas/user.schema';
+import { MongooseMiddlewareHelper } from 'src/global/helper/mongoose_middleware.helper';
+import { Reservable } from 'src/api/reservable/models/schemas/reservable.schema';
+import { ReservationStatus } from '../enums/ReservationStatus.enum';
 
 export type ReservationDocument = Reservation & Document;
 
-@Schema()
+@Schema(
+  { timestamps: true }
+)
 export class Reservation {
+  id: string;
   @Prop({ type: Date, required: true })
   date: Date;
 
   @Prop({ required: true })
-  time: string;
+  time: number;
 
   @Prop({ required: true })
   duration: number;
 
-  @Prop({ type: String, enum: ['pending', 'confirmed', 'cancelled'], default: 'pending' })
-  status: string;
+  @Prop({ type: Number, enum: ReservationStatus, default: ReservationStatus.Pending })
+  status: ReservationStatus;
 
-  @Prop({ type: 'ObjectId', ref: 'User', required: true })
-  userId: UserDocument;
+  @Prop({ type: Types.ObjectId, ref: User.name, required: true })
+  userId: Types.ObjectId | User;
 
-  @Prop({ type: 'ObjectId', ref: 'Location', required: true })
-  locationId: LocationDocument;
+  @Prop({ type: Types.ObjectId, ref: Reservable.name, required: true })
+  reservableId: Types.ObjectId | Reservable;
 
 }
 
 export const ReservationSchema = SchemaFactory.createForClass(Reservation);
+
+MongooseMiddlewareHelper.setupMappingMiddlewares(ReservationSchema);
