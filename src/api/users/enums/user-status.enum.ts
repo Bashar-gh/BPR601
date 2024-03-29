@@ -1,4 +1,4 @@
 export enum UserStatus {
     AllGood = "ALLGOOD",
-    VerifyEmail="VerifyEmail",
+    VerifyEmail="VERIFYEMAIL",
 }

@@ -1,0 +1,16 @@
+version: '3.4'
+
+services:
+  bimserver:
+    image: bimserver
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      - PORT=${PORT}
+    ports:
+      - '3000:3000'
+    depends_on:
+      - db
+    volumes:
+      - ./src:/app/src

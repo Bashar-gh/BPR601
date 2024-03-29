@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { MongooseMiddlewareHelper } from 'src/global/helper/mongoose_middleware.helper';
 import { SideOrderType } from '../enums/sideorder_type.enum';
-import { ReviewSum } from 'src/global/models/types/review_sum.type';
+import { ReviewSum } from 'src/global/models/schema/review_sum.schema';
 
 export type SideOrderDocument = SideOrder & Document;
 
@@ -21,8 +21,8 @@ export class SideOrder {
     description: string;
     @Prop({ required: true })
     price: number;
-    @Prop({ required: true })
-    reviewSum: ReviewSum
+    @Prop({ type:  ReviewSum, required: true })
+    reviewSum: ReviewSum;
 
 }
 

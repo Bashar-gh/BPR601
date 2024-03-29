@@ -5,7 +5,7 @@ import { CreateReviewDTO } from './models/dtos/create_review.dto';
 import { JWT_Data } from 'src/auth/types/jwt-data.type';
 import { StatusDTO } from 'src/global/models/dtos/status.dto';
 
-@Controller('reviews')
+@Controller('api/reviews')
 export class ReviewsController {
 
     constructor(private reviewService: ReviewsService) { }

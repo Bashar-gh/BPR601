@@ -4,7 +4,7 @@ import { StatusDTO } from 'src/global/models/dtos/status.dto';
 import { JWT_Data } from 'src/auth/types/jwt-data.type';
 import { MyFavorites } from './models/types/my_favorites.type';
 
-@Controller('favorite')
+@Controller('api/favorite')
 export class FavoriteController {
     constructor(private favoriteService: FavoriteService) { }
     @Put("fav/sideOrder")

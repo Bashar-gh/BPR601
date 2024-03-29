@@ -6,6 +6,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { SideOrderType } from './models/enums/sideorder_type.enum';
 import { mapSideOrderDetails, SideOrderDetails } from './models/types/sideorder_details.type';
 import { CreateSideOrderDTO } from './models/dtos/create_sideorder.dto';
+import NotFound from 'src/global/errors/not_found.error';
 
 @Injectable()
 export class SideordersService {
@@ -28,6 +29,9 @@ export class SideordersService {
     }
     async getDetails(id: string): Promise<SideOrderDetails> {
         let data = await this.sideOrderModel.findById(id);
+        if(!data){
+            throw new NotFound(SideOrder);
+        }
         return mapSideOrderDetails(data);
     }
 

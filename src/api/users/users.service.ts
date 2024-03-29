@@ -5,6 +5,7 @@ import { Model } from "mongoose";
 import { UserStatus } from "./enums/user-status.enum";
 import { genSaltSync, hashSync } from "bcrypt";
 import { mapUserDetails, UserDetails } from "./models/types/user_details.type";
+import NotFound from "src/global/errors/not_found.error";
 
 @Injectable()
 export class UsersService {
@@ -13,16 +14,25 @@ export class UsersService {
     return this.userModel.find().exec();
   }
 
-  async getDetails(id:string):Promise<UserDetails>{
-    let data = await this.userModel.findById(id);
+  async getDetails(id: string): Promise<UserDetails> {
+    let data = await this.findById(id);
     return mapUserDetails(data);
 
   }
   async findById(id: string): Promise<User> {
-    return this.userModel.findById(id).exec();
+
+    let data = await this.userModel.findById(id).exec();
+    if (!data) {
+      throw new NotFound(User);
+    }
+    return data;
   }
-  async updateById(id: string, userData: Partial<User>) {
-    return this.userModel.findByIdAndUpdate(id, userData, { new: true }).exec();
+  async updateById(id: string, userData: Partial<User>): Promise<User> {
+    let data = await this.userModel.findByIdAndUpdate(id, userData, { new: true }).exec();
+    if (!data) {
+      throw new NotFound(User);
+    }
+    return data;
   }
   async makeEmailVerified(id: string): Promise<User> {
     return this.updateById(id, { accountStatus: UserStatus.AllGood, otpCode: undefined });
@@ -44,7 +54,11 @@ export class UsersService {
 
 
   async delete(id: string): Promise<User> {
-    return this.userModel.findByIdAndDelete(id).exec();
+    let data = await this.userModel.findByIdAndDelete(id).exec();
+    if (!data) {
+      throw new NotFound(User);
+    }
+    return data;
   }
 
 }

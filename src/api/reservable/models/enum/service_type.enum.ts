@@ -3,5 +3,6 @@ export enum ServiceType {
     Cafe="CAFE",
     Restaurant="RES",
     Gym="GYM",
+    Cinema="CIN"
 
 }

@@ -17,8 +17,8 @@ export class ReviewsService {
     async create(userId: string, reviewFor: ReveiwFor, dto: CreateReviewDTO): Promise<StatusDTO> {
         let review = new this.reservableModel({
             userId: userId.toObjectID(),
-            serviceId: reviewFor.serviceId.toObjectID(),
-            sideOrderId: reviewFor.sideOrderId.toObjectID(),
+            serviceId: reviewFor.serviceId?.toObjectID(),
+            sideOrderId: reviewFor.sideOrderId?.toObjectID(),
             ...dto
         });
         let saved = await review.save();

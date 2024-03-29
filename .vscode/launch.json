@@ -14,10 +14,10 @@
               "start:debug",
              
             ],
-            "autoAttachChildProcesses": true,
-            "restart": true,
-            "sourceMaps": true,
-            "stopOnEntry": false,
+            // "autoAttachChildProcesses": true,
+            // "restart": true,
+            // "sourceMaps": true,
+            // "stopOnEntry": false,
             "console": "integratedTerminal",
           },
           {
@@ -30,10 +30,10 @@
               "start:debugNo",
              
             ],
-            "autoAttachChildProcesses": true,
-            "restart": true,
-            "sourceMaps": true,
-            "stopOnEntry": false,
+            // "autoAttachChildProcesses": true,
+            // "restart": true,
+            // "sourceMaps": true,
+            // "stopOnEntry": false,
             "console": "integratedTerminal",
           },
           

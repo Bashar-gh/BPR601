@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+  ontime:
+    image: ontime
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      - PORT=${PORT}
+    ports:
+      - '3000:3000'
+    
+ 

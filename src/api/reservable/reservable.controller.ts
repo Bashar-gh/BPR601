@@ -7,7 +7,7 @@ import { CreateReservableDTO } from './models/dtos/create_reservable.dto';
 import { Roles } from 'src/auth/decorators/role.decorator';
 import { Role } from 'src/auth/enums/role.enum';
 
-@Controller('reservable')
+@Controller('api/reservable')
 export class ReservableController {
 
     constructor(private reservableService: ReservableService) { }

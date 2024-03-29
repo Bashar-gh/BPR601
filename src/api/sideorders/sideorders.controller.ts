@@ -6,7 +6,7 @@ import { CreateSideOrderDTO } from './models/dtos/create_sideorder.dto';
 import { Roles } from 'src/auth/decorators/role.decorator';
 import { Role } from 'src/auth/enums/role.enum';
 
-@Controller('sideorders')
+@Controller('api/sideorders')
 export class SideordersController {
 
     constructor(private sideOrderService: SideordersService) { }

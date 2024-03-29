@@ -6,6 +6,7 @@ import { ServiceType } from './models/enum/service_type.enum';
 import { mapReservableItem, ReservableListItem } from './models/types/reservable_list_item';
 import { mapReservableDetails, ReservableDetails } from './models/types/reservable_details.type';
 import { CreateReservableDTO } from './models/dtos/create_reservable.dto';
+import NotFound from 'src/global/errors/not_found.error';
 
 @Injectable()
 export class ReservableService {
@@ -36,6 +37,9 @@ export class ReservableService {
   }
   async getDetails(id: string): Promise<ReservableDetails> {
     let data = await this.reservableModel.findById(id);
+    if(!data){
+      throw new NotFound(Reservable);
+    }
     return mapReservableDetails(data);
   }
 

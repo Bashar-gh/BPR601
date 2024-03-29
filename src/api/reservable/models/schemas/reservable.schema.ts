@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { MongooseMiddlewareHelper } from 'src/global/helper/mongoose_middleware.helper';
 import { ServiceType } from '../enum/service_type.enum';
-import { ReviewSum } from 'src/global/models/types/review_sum.type';
+import { ReviewSum } from 'src/global/models/schema/review_sum.schema';
 
 export type ReservableDocument = Reservable & Document;
 
@@ -23,8 +23,8 @@ export class Reservable {
   image: number;
   @Prop({ required: true })
   capacity: number;
-  @Prop({required: true })
-  reviewSum:ReviewSum
+  @Prop({ type: ReviewSum, required: true })
+  reviewSum: ReviewSum;
 
 }
 
