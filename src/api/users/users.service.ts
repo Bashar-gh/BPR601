@@ -4,6 +4,7 @@ import { User, UserDocument } from "./models/schemas/user.schema";
 import { Model } from "mongoose";
 import { UserStatus } from "./enums/user-status.enum";
 import { genSaltSync, hashSync } from "bcrypt";
+import { mapUserDetails, UserDetails } from "./models/types/user_details.type";
 
 @Injectable()
 export class UsersService {
@@ -12,6 +13,11 @@ export class UsersService {
     return this.userModel.find().exec();
   }
 
+  async getDetails(id:string):Promise<UserDetails>{
+    let data = await this.userModel.findById(id);
+    return mapUserDetails(data);
+
+  }
   async findById(id: string): Promise<User> {
     return this.userModel.findById(id).exec();
   }

@@ -7,8 +7,10 @@ import { SideordersModule } from './sideorders/sideorders.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { FavoriteModule } from './favorite/favorite.module';
 
+
 @Module({
     imports: [
+       
         UsersModule,
         ReservationsModule,
         PaymentsModule,

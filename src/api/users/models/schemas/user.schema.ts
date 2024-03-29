@@ -2,8 +2,9 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { Role } from '../../../../auth/enums/role.enum';
 import { UserStatus } from '../../enums/user-status.enum';
-import { genSaltSync, hashSync }from 'bcrypt';
+import { genSaltSync, hashSync } from 'bcrypt';
 import { MongooseMiddlewareHelper } from '../../../../global/helper/mongoose_middleware.helper';
+import { Gender } from '../../enums/gender.enum';
 export type UserDocument = HydratedDocument<User>;
 
 @Schema({
@@ -13,13 +14,13 @@ export type UserDocument = HydratedDocument<User>;
 })
 export class User {
 
-  
+
   id: string;
 
   @Prop({ unique: true, required: true })
   email: string;
 
- 
+
   @Prop({ required: true })
   password: string;
 
@@ -30,10 +31,11 @@ export class User {
   lastName: string;
   @Prop({})
   otpCode: string;
-
+  @Prop({ type: Number, enum: Gender })
+  gender: Gender
   @Prop({ type: Date, })
   dateOfBirth: Date;
-  @Prop({ type: String, unique: true, required: true})
+  @Prop({ type: String, unique: true, required: true })
   phone: string;
 
   @Prop({ type: String, enum: Role, default: Role.User })
@@ -41,7 +43,7 @@ export class User {
   @Prop({ type: String, enum: UserStatus, default: UserStatus.VerifyEmail })
   accountStatus: UserStatus;
 
-  
+
 
 }
 
