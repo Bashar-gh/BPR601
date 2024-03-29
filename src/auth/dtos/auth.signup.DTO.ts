@@ -1,4 +1,5 @@
-import { IsDate, IsDateString, IsEmail, IsNotEmpty, MaxLength, MinLength, Validate } from "class-validator";
+import { IsDate, IsDateString, IsEmail, IsEnum, IsNotEmpty, IsPhoneNumber, MaxLength, MinLength, Validate } from "class-validator";
+import { Gender } from "src/api/users/enums/gender.enum";
 
 export class SignUpReqDTO {
     @IsEmail()
@@ -18,10 +19,17 @@ export class SignUpReqDTO {
     @MinLength(3)
     @MaxLength(35)
     lastName: string;
+    @IsNotEmpty()
+    @IsPhoneNumber()
+    phone: string;
+    
+    @IsNotEmpty()
+    @IsEnum(Gender)
+    gender: Gender;
 
     @IsNotEmpty()
     @IsDateString()
     dateOfBirth: string;
 
-  
+
 }
