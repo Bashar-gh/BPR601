@@ -5,12 +5,20 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { SideOrderType } from './models/enums/sideorder_type.enum';
 import { mapSideOrderDetails, SideOrderDetails } from './models/types/sideorder_details.type';
+import { CreateSideOrderDTO } from './models/dtos/create_sideorder.dto';
 
 @Injectable()
 export class SideordersService {
 
     constructor(@InjectModel(SideOrder.name) private sideOrderModel: Model<SideOrderDocument>) { }
-
+    async create(dto: CreateSideOrderDTO): Promise<SideOrderDetails> {
+        let sideOrder = new this.sideOrderModel({
+            ...dto,
+            reviewSum: { avg: 0, count: 0 }
+        });
+        let saved = await sideOrder.save();
+        return mapSideOrderDetails(saved);
+    }
     async getMostPopular(): Promise<SideOrderListItem[]> {
         let topThreeQuery = this.sideOrderModel.find();
         topThreeQuery.sort({ "reviewSum.avg": 1 });

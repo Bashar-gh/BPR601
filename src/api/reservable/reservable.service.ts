@@ -5,16 +5,22 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ServiceType } from './models/enum/service_type.enum';
 import { mapReservableItem, ReservableListItem } from './models/types/reservable_list_item';
 import { mapReservableDetails, ReservableDetails } from './models/types/reservable_details.type';
+import { CreateReservableDTO } from './models/dtos/create_reservable.dto';
 
 @Injectable()
 export class ReservableService {
 
   constructor(@InjectModel(Reservable.name) private reservableModel: Model<ReservableDocument>) { }
 
+  async create(dto: CreateReservableDTO): Promise<ReservableDetails> {
+    let reservable = new this.reservableModel({ ...dto, reviewSum: { avg: 0, count: 0 } });
+    let saved = await reservable.save();
+    return mapReservableDetails(saved);
+  }
   async getByType(type: ServiceType): Promise<ReservableListItem[]> {
     let reservables = await this.reservableModel.find({ serviceType: type }).exec();
 
-    return reservables.map(mapReservableItem );
+    return reservables.map(mapReservableItem);
   }
 
   async getTopRatedReservables(): Promise<ReservableListItem[]> {
@@ -28,7 +34,7 @@ export class ReservableService {
     }
     return topRatedReservables;
   }
-  async getDetails(id:string): Promise<ReservableDetails> {
+  async getDetails(id: string): Promise<ReservableDetails> {
     let data = await this.reservableModel.findById(id);
     return mapReservableDetails(data);
   }

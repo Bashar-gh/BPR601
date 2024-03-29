@@ -4,6 +4,7 @@ import { User } from '../../../users/models/schemas/user.schema';
 import { MongooseMiddlewareHelper } from 'src/global/helper/mongoose_middleware.helper';
 import { Reservable } from 'src/api/reservable/models/schemas/reservable.schema';
 import { ReservationStatus } from '../enums/ReservationStatus.enum';
+import { ReservationSideOrder } from './reservation_sideorder.schema';
 
 export type ReservationDocument = Reservation & Document;
 
@@ -29,6 +30,8 @@ export class Reservation {
 
   @Prop({ type: Types.ObjectId, ref: Reservable.name, required: true })
   reservableId: Types.ObjectId | Reservable;
+  @Prop({ type: [ReservationSideOrder], required: true })
+  sideOrders: ReservationSideOrder[];
 
 }
 
