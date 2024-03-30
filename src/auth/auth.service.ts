@@ -15,7 +15,10 @@ import { IncorrectUserCredentials } from './errors/incorrect_credentials.error';
 import { UserAlreadyExists } from './errors/user_already_exists.error';
 import { IncorrectOtpCode } from './errors/incorrect_otp_code.error';
 import NotFound from 'src/global/errors/not_found.error';
-type LoginUserParams = SignInReqDTO & { user: User };
+import { PasswordResetRequestRes } from './types/password_reset_req.type';
+import { Role } from './enums/role.enum';
+import NotAutherized from 'src/global/errors/not_autherized.error';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -24,7 +27,7 @@ export class AuthService {
     private mailerService: EmailingService
   ) { }
 
-  async signIn(signInDTO: SignInReqDTO, deviceId: string): Promise<SignInResDTO> {
+  async signIn(signInDTO: SignInReqDTO): Promise<SignInResDTO> {
 
     const users = await this.usersService.findByEmail(signInDTO.email);
     if (users.length == 0) {
@@ -34,25 +37,38 @@ export class AuthService {
     if (!compareSync(signInDTO.password, user.password)) {
       throw new IncorrectUserCredentials();
     }
-    return this._loginUser({ user: user, ...signInDTO }, false);
+    return this._loginUser(user);
 
   }
-  async signUp(signUpDTO: SignUpReqDTO, deviceId: string): Promise<SignInResDTO> {
+  async refresh(payload: JWT_Data): Promise<SignInResDTO> {
+
+    const user = await this.usersService.findById(payload.userId);
+
+
+    return this._loginUser(user);
+
+  }
+  async signUp(signUpDTO: SignUpReqDTO): Promise<SignInResDTO> {
     const users = await this.usersService.findByEmail(signUpDTO.email);
     if (users.length != 0) {
       throw new UserAlreadyExists();
     }
-    var newUser = new User();
+    if(signUpDTO.role == Role.Admin){
+      throw new NotAutherized();
+    }
+    var newUser:User = new User();
     newUser.email = signUpDTO.email;
     newUser.password = signUpDTO.password;
     newUser.firstName = signUpDTO.firstName;
     newUser.lastName = signUpDTO.lastName;
+    newUser.phone = signUpDTO.phone;
+    newUser.gender = signUpDTO.gender;
     newUser.dateOfBirth = new Date(signUpDTO.dateOfBirth);
     newUser.otpCode = this.generateOTPCode();
 
 
     const user = await this.usersService.create(newUser);
-    return this._loginUser({ user: user, ...signUpDTO }, true);
+    return this._loginUser(user);
 
   }
   async verifEmail(userId: string, code: string): Promise<StatusDTO> {
@@ -63,7 +79,7 @@ export class AuthService {
     return { Status: true };
 
   }
-  async requestPasswordReset(email: string): Promise<StatusDTO> {
+  async requestPasswordReset(email: string): Promise<PasswordResetRequestRes> {
     const users = await this.usersService.findByEmail(email);
     if (users.length == 0) {
       throw new NotFound(User);
@@ -71,14 +87,14 @@ export class AuthService {
     let code = this.generateOTPCode();
     await this.usersService.updateById(users[0].id, { otpCode: code });
     await this.mailerService.sendUserConfirmation(users[0], code);
-    return { Status: true };
+    return { jwt: await this.generateJwtToken({ userId: users[0].id, role: users[0].type, accountStatus: UserStatus.ForgotPassword }) };
 
   }
-  async resetPassword(userId: string, code: string,password:string): Promise<StatusDTO> {
+  async resetPassword(userId: string, code: string, password: string): Promise<StatusDTO> {
     const user = await this.usersService.findById(userId);
     if (user.otpCode == undefined) return { Status: false };
     if (code.trim().normalize() != user.otpCode.trim().normalize()) throw new IncorrectOtpCode();
-    await this.usersService.setPassword(userId,password);
+    await this.usersService.setPassword(userId, password);
     return { Status: true };
   }
 
@@ -99,15 +115,17 @@ export class AuthService {
   private generateJwtToken(data: JWT_Data): Promise<string> {
     return this.jwtService.signAsync(data);
   }
-  private async _loginUser(params: LoginUserParams, signup: boolean): Promise<SignInResDTO> {
+  private async _loginUser(user: User): Promise<SignInResDTO> {
 
-    if (params.user.accountStatus == UserStatus.VerifyEmail) {
-      await this.mailerService.sendUserConfirmation(params.user, params.user.otpCode);
+    if (user.accountStatus == UserStatus.VerifyEmail) {
+      await this.mailerService.sendUserConfirmation(user, user.otpCode);
 
+    } else {
+      await this.usersService.updateById(user.id, { otpCode: undefined });
     }
 
-    let jwt = await this.generateJwtToken({ userId: params.user.id, accountStatus: params.user.accountStatus, role: params.user.type });
-    return { id: params.user.id, user_email: params.user.email, display_name: `${params.user.firstName} ${params.user.lastName}`, user_status: params.user.accountStatus, user_role: params.user.type, jwt: jwt };
+    let jwt = await this.generateJwtToken({ userId: user.id, accountStatus: user.accountStatus, role: user.type });
+    return { id: user.id, user_email: user.email, display_name: `${user.firstName} ${user.lastName}`,user_bday:user.dateOfBirth.toISOString(),user_phone:user.phone,user_gender:user.gender, jwt: jwt };
 
   }
 }

@@ -10,7 +10,7 @@ export class EmailingService {
      
       await this.mailerService.sendMail({
         to: user.email,
-        subject: 'Welcome to Syria BIM Academy!',
+        subject: 'Welcome to On Time!',
         text:`Please Confirm Your Email To Access Your Account \n Confirmation Code : ${token}`
       });
       

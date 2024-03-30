@@ -1,5 +1,6 @@
 import { IsDate, IsDateString, IsEmail, IsEnum, IsNotEmpty, IsPhoneNumber, MaxLength, MinLength, Validate } from "class-validator";
 import { Gender } from "src/api/users/enums/gender.enum";
+import { Role } from "../enums/role.enum";
 
 export class SignUpReqDTO {
     @IsEmail()
@@ -26,6 +27,10 @@ export class SignUpReqDTO {
     @IsNotEmpty()
     @IsEnum(Gender)
     gender: Gender;
+    @IsNotEmpty()
+    @IsEnum(Role)
+    
+    role: Role;
 
     @IsNotEmpty()
     @IsDateString()

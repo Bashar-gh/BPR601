@@ -6,6 +6,8 @@ import { SignUpReqDTO } from './dtos/auth.signup.DTO';
 import { AcceptedStatus } from './decorators/status.decorator';
 import { UserStatus } from '../api/users/enums/user-status.enum';
 import { StatusDTO } from '../global/models/dtos/status.dto';
+import { JWT_Data } from './types/jwt-data.type';
+import { PasswordResetRequestRes } from './types/password_reset_req.type';
 
 @Controller('auth')
 export class AuthController {
@@ -15,12 +17,17 @@ export class AuthController {
   @Post('login')
   @Public()
   signIn(@Body() signInDto: SignInReqDTO,@Req() request:any): Promise<SignInResDTO> {
-    return this.authService.signIn(signInDto,request.DID);
+    return this.authService.signIn(signInDto);
   }
   @Post('signup')
   @Public()
   signup(@Body() signUoDto: SignUpReqDTO,@Req() request:any): Promise<SignInResDTO> {
-    return this.authService.signUp(signUoDto,request.DID);
+    return this.authService.signUp(signUoDto);
+  }
+  @Get('refresh')
+  refresh(@Req() request:any): Promise<SignInResDTO> {
+    let payload:JWT_Data = request.payload;
+    return this.authService.refresh(payload);
   }
   @Get('ping')
   @Public()
@@ -28,22 +35,27 @@ export class AuthController {
     return { Status: true };
   }
 
-  @Get('logout/:id')
-  signOut(@Param('id') id: string):Promise<StatusDTO> {
-    return this.authService.signOut(id);
+  @Get('logout')
+  signOut(@Req() request: any,):Promise<StatusDTO> {
+    let payload:JWT_Data = request.payload;
+    return this.authService.signOut(payload.userId);
   }
-  @Get('verifyEmail/:id')
+  @Get('verifyEmail')
   @AcceptedStatus(UserStatus.VerifyEmail)
-  async verifyEmail(@Param("id") id: string, @Query("code") code: string) {
-    return await this.authService.verifEmail(id, code);
+  async verifyEmail(@Req() request: any, @Query("code") code: string): Promise<StatusDTO> {
+    let payload:JWT_Data = request.payload;
+    return await this.authService.verifEmail(payload.userId, code);
   }
   @Get('reqPasswordReset')
-  async reqPasswordReset(@Query("email") email: string, @Query("code") code: string) {
+  @Public()
+  async reqPasswordReset(@Query("email") email: string): Promise<PasswordResetRequestRes> {
     return await this.authService.requestPasswordReset(email);
   }
-  @Post('resetPassword/:id')
-  async resetPassword(@Param("id") id: string, @Query("code") code: string,@Body("password")password:string) {
-    return await this.authService.resetPassword(id,code,password);
+  @Post('resetPassword')
+  @AcceptedStatus(UserStatus.ForgotPassword)
+  async resetPassword(@Req() request: any, @Query("code") code: string,@Body("password")password:string): Promise<StatusDTO> {
+    let payload:JWT_Data = request.payload;
+    return await this.authService.resetPassword(payload.userId,code,password);
   }
   
 

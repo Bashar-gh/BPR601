@@ -19,31 +19,24 @@ export class User {
 
   @Prop({ unique: true, required: true })
   email: string;
-
-
   @Prop({ required: true })
   password: string;
-
   @Prop({})
   firstName: string;
-
   @Prop({})
   lastName: string;
   @Prop({})
   otpCode: string;
-  @Prop({ type: Number, enum: Gender })
+  @Prop({ type: Number, enum: Gender ,required:true })
   gender: Gender
   @Prop({ type: Date, })
   dateOfBirth: Date;
   @Prop({ type: String, unique: true, required: true })
   phone: string;
-
   @Prop({ type: String, enum: Role, default: Role.User })
   type: Role;
   @Prop({ type: String, enum: UserStatus, default: UserStatus.VerifyEmail })
   accountStatus: UserStatus;
-
-
 
 }
 
