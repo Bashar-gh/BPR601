@@ -30,6 +30,13 @@ export class ReservableService {
     }
     return reservables.commission;
   }
+  async getCapacity(id:string): Promise<number> {
+    let reservables = await this.reservableModel.findById(id).select('capacity');
+    if(!reservables){
+      throw new NotFound(Reservable);
+    }
+    return reservables.capacity;
+  }
   async getTopRatedReservables(): Promise<ReservableListItem[]> {
     let topRatedReservables: ReservableListItem[] = [];
     for (let type in ServiceType) {

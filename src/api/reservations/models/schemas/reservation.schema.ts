@@ -22,7 +22,8 @@ export class Reservation {
   duration: number;
   @Prop({ min: 0, required: true })
   price: number;
-
+  @Prop({ min: 0, required: true })
+  capacity: number;
   @Prop({ type: Types.ObjectId, ref: User.name, required: true })
   userId: Types.ObjectId | User;
 

@@ -21,7 +21,7 @@ export class ReservationsService {
     constructor(@InjectModel(Reservation.name) private reservationModel: Model<ReservationDocument>,
         private siderOrdersService: SideordersService,
         private paymentService: PaymentsService,
-        private reservableService:ReservableService
+        private reservableService: ReservableService
     ) { }
     private startHour: number = 9;
     private endHour: number = 21;
@@ -31,6 +31,12 @@ export class ReservationsService {
         let cost = await this.reservableService.getPrice(serviceId);
         let servicePrice = cost;
         let orders: ReservationSideOrder[] = [];
+        const capacity = await this.reservableService.getCapacity(serviceId);
+        const usedCapacity = await this.usedCapForService(serviceId, dto.date);
+        let leftCapacity = capacity - usedCapacity;
+        if (dto.capacity < leftCapacity) {
+            throw new Error("No Place Available ");
+        }
         for (let order of dto.sideOrders) {
             let price = prices.find((p) => p.id.toString() == order.orderId.toString())?.price ?? 0;
             cost += price * order.count;
@@ -44,14 +50,14 @@ export class ReservationsService {
         let data = new this.reservationModel({
             userId: userId,
             reservableId: serviceId,
-            price:servicePrice,
+            price: servicePrice,
             ...mainData,
 
             sideOrders: orders,
         });
         let saved = await data.save();
-        let payment = await this.paymentService.create(saved.id,cost,dto.payment_method);
-         
+        let payment = await this.paymentService.create(saved.id, cost, dto.payment_method);
+
         return this.getReservationDetails(saved.id);
     }
     async getMyReservations(userId: string): Promise<ArrayReturn<ReservationListItem>> {
@@ -60,12 +66,12 @@ export class ReservationsService {
             ARRAY: reservations.map(mapReservationListItem)
         };
     }
-    async getReservationDetails(reservationId:string): Promise<ReservationDetails> {
-        let query =  this.reservationModel.findById(reservationId);
+    async getReservationDetails(reservationId: string): Promise<ReservationDetails> {
+        let query = this.reservationModel.findById(reservationId);
         query.populate('userId');
         query.populate('reservableId');
         let data = await query.exec();
-        if(!data){
+        if (!data) {
             throw new NotFound(Reservation);
         }
         return mapReservationDetails(data);
@@ -77,26 +83,27 @@ export class ReservationsService {
         const next7Days = Array.from({ length: 7 }, (_, i) => new Date(today.getTime() + i * 24 * 60 * 60 * 1000));
 
         const daysWithAvailableTime: Date[] = [];
-
+        const capacity = await this.reservableService.getCapacity(reservableId);
         for (const day of next7Days) {
-            const reservations = await this.reservationModel.find({
-                reservableId: reservableId,
-                date: { $gte: day, $lt: new Date(day.getTime() + 24 * 60 * 60 * 1000) },
-            });
+            const reservations = await this.getReservationsForDay(reservableId, day);
 
             if (!reservations || reservations.length === 0) {
                 daysWithAvailableTime.push(day);
                 continue;
             }
             let reservedTimeSlots: number[] = [];
+            let usedCapacity: number = 0;
             for (let reservation of reservations) {
                 const startTime = reservation.time;
                 const endTime = startTime + reservation.duration;
-
+                usedCapacity += reservation.capacity;
                 // Mark the time slots within the reservation duration as reserved
                 for (let i = startTime; i < endTime; i++) {
                     reservedTimeSlots.push(i);
                 }
+            }
+            if (usedCapacity >= capacity) {
+                continue;
             }
             for (let i = this.startHour; i <= this.endHour; i++) {
                 if (!reservedTimeSlots.includes(i)) {
@@ -118,15 +125,19 @@ export class ReservationsService {
 
     async getAvailableTimesForDay(reservableId: string, day: string): Promise<ArrayReturn<TimeSlot>> {
         let dayDate = new Date(day);
-        const reservations = await this.reservationModel.find({
-            reservableId: reservableId,
-            date: { $gte: dayDate, $lt: new Date(dayDate.getTime() + 24 * 60 * 60 * 1000) },
-        });
+        const reservations = await this.getReservationsForDay(reservableId, dayDate);
 
-        // Assuming the venue operates from 9 AM to 9 PM with 1-hour time slots
+        const capacity = await this.reservableService.getCapacity(reservableId);
+        let usedCapacity: number = await this.usedCapForService(reservableId, dayDate);
+
         const availableSlots: TimeSlot[] = [];
+        if (usedCapacity >= capacity) {
+            return {
+                ARRAY: availableSlots,
+            };
+        }
         for (let i = this.startHour; i <= this.endHour; i++) {
-            if (!reservations.find(reservation => reservation.time === i)) {
+            if (!reservations.find(reservation => reservation.time === i || reservation.time + reservation.duration >= i)) {
                 availableSlots.push({ startTime: i, endTime: i + 1 });
             }
         }
@@ -136,5 +147,24 @@ export class ReservationsService {
         };
     }
 
+    private async getReservationsForDay(serviceId: string, day: Date): Promise<Reservation[]> {
+        return this.reservationModel.find({
+            reservableId: serviceId.toObjectID(),
+            date: { $gte: day, $lt: new Date(day.getTime() + 24 * 60 * 60 * 1000) },
+        }).exec();
+    }
+    private async usedCapForService(serviceId: string, day: Date): Promise<number> {
+        let data = await this.reservationModel.find({
+            reservableId: serviceId.toObjectID(),
+            date: { $gte: day, $lt: new Date(day.getTime() + 24 * 60 * 60 * 1000) },
+        }).select('capacity').exec();
+        let used: number = 0;
+        for (let i = 0; i < data.length; i++) {
+            const e = data[i];
+            used += e.capacity;
+
+        }
+        return used;
+    }
 
 }

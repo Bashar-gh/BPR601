@@ -17,6 +17,10 @@ export class CreateReservationDTO {
     @Max(4)
     duration: number;
     @IsNotEmpty()
+    @IsNumber()
+    @Min(1)
+    capacity: number;
+    @IsNotEmpty()
     @IsArray()
     @ValidateNested()
     sideOrders: ReservationSideOrderDTO[];
