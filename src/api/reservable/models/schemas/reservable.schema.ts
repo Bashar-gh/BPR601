@@ -21,8 +21,10 @@ export class Reservable {
   serviceType: ServiceType;
   @Prop({ required: true })
   image: number;
-  @Prop({ required: true })
+  @Prop({ min: 0, required: true })
   capacity: number;
+  @Prop({ min: 0, required: true })
+  commission: number;
   @Prop({ type: ReviewSum, required: true })
   reviewSum: ReviewSum;
 

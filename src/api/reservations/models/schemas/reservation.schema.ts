@@ -3,7 +3,6 @@ import { Document, Types } from 'mongoose';
 import { User } from '../../../users/models/schemas/user.schema';
 import { MongooseMiddlewareHelper } from 'src/global/helper/mongoose_middleware.helper';
 import { Reservable } from 'src/api/reservable/models/schemas/reservable.schema';
-import { ReservationStatus } from '../enums/ReservationStatus.enum';
 import { ReservationSideOrder } from './reservation_sideorder.schema';
 
 export type ReservationDocument = Reservation & Document;
@@ -21,9 +20,8 @@ export class Reservation {
 
   @Prop({ required: true })
   duration: number;
-
-  @Prop({ type: Number, enum: ReservationStatus, default: ReservationStatus.Pending })
-  status: ReservationStatus;
+  @Prop({ min: 0, required: true })
+  price: number;
 
   @Prop({ type: Types.ObjectId, ref: User.name, required: true })
   userId: Types.ObjectId | User;
@@ -36,5 +34,6 @@ export class Reservation {
 }
 
 export const ReservationSchema = SchemaFactory.createForClass(Reservation);
-
+ReservationSchema.index({ date: 1, time: 1, reservableId: 1 }, { unique: true });
+ReservationSchema.index({ userId: 1, reservableId: 1 }, { unique: true });
 MongooseMiddlewareHelper.setupMappingMiddlewares(ReservationSchema);

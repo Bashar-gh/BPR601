@@ -1,3 +1,4 @@
+import { SideOrderType } from "../enums/sideorder_type.enum";
 import { SideOrder } from "../schema/sideorder.schema";
 
 export type SideOrderDetails = {
@@ -7,6 +8,8 @@ export type SideOrderDetails = {
     review_count: number,
     description: string,
     price: number,
+    type:SideOrderType,
+    image:number,
 };
 export const mapSideOrderDetails = (order: SideOrder): SideOrderDetails => {
     return {
@@ -15,6 +18,8 @@ export const mapSideOrderDetails = (order: SideOrder): SideOrderDetails => {
         avg_review: order.reviewSum.avg,
         review_count: order.reviewSum.count,
         description: order.description,
-        price: order.price
+        price: order.price,
+        type:order.orderType,
+        image:order.image
     };
 }

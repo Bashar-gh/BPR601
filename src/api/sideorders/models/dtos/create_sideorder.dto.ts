@@ -2,6 +2,7 @@ import { IsEnum, IsNotEmpty, IsNumber, IsString, Min } from "class-validator";
 import { SideOrderType } from "../enums/sideorder_type.enum";
 
 export class CreateSideOrderDTO {
+  
     @IsNotEmpty()
     @IsString()
     name: string;

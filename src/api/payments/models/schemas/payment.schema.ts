@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { Reservation, ReservationDocument } from '../../../reservations/models/schemas/reservation.schema';
 import { MongooseMiddlewareHelper } from 'src/global/helper/mongoose_middleware.helper';
+import { PaymentMethod } from '../enums/payment_method.enum';
 
 export type PaymentDocument = Payment & Document;
 
@@ -10,11 +11,8 @@ export class Payment {
   @Prop({ required: true })
   amount: number;
 
-  @Prop({ required: true })
-  paymentMethod: string;
-
-  @Prop({ required: true })
-  transactionId: string;
+  @Prop({ type: Number, enum: PaymentMethod, required: true })
+  paymentMethod: PaymentMethod;
 
   @Prop({ type: Types.ObjectId, ref: Reservation.name, required: true })
   reservationId: Types.ObjectId | Reservation;

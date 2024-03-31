@@ -20,7 +20,7 @@ export const mapMyFavorites = (favs:Favorite[]):MyFavorites=>{
             myFav.services.push(mapReservableItem(fav.serviceId as Reservable))
         }
         if(fav.sideOrderId){
-            myFav.services.push(mapSideOrderItem(fav.sideOrderId as SideOrder))
+            myFav.sideOrders.push(mapSideOrderItem(fav.sideOrderId as SideOrder))
         }
 
     }

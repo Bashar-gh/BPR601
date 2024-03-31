@@ -23,5 +23,9 @@ export class CreateReservableDTO {
     @IsNumber()
     @Min(0)
     capacity: number;
+    @IsNotEmpty()
+    @IsNumber()
+    @Min(0)
+    commission:number;
 
 }

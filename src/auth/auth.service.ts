@@ -73,7 +73,7 @@ export class AuthService {
   }
   async verifEmail(userId: string, code: string): Promise<StatusDTO> {
     const user = await this.usersService.findById(userId);
-    if (user.otpCode == undefined) return { Status: false };
+    if (user.otpCode.length == 0) return { Status: false };
     if (code.trim().normalize() != user.otpCode.trim().normalize()) throw new IncorrectOtpCode();
     await this.usersService.makeEmailVerified(userId);
     return { Status: true };
@@ -92,7 +92,7 @@ export class AuthService {
   }
   async resetPassword(userId: string, code: string, password: string): Promise<StatusDTO> {
     const user = await this.usersService.findById(userId);
-    if (user.otpCode == undefined) return { Status: false };
+    if (user.otpCode.length == 0) return { Status: false };
     if (code.trim().normalize() != user.otpCode.trim().normalize()) throw new IncorrectOtpCode();
     await this.usersService.setPassword(userId, password);
     return { Status: true };

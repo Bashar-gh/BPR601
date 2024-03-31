@@ -23,7 +23,13 @@ export class ReservableService {
 
     return reservables.map(mapReservableItem);
   }
-
+  async getPrice(id:string): Promise<number> {
+    let reservables = await this.reservableModel.findById(id).select('commission');
+    if(!reservables){
+      throw new NotFound(Reservable);
+    }
+    return reservables.commission;
+  }
   async getTopRatedReservables(): Promise<ReservableListItem[]> {
     let topRatedReservables: ReservableListItem[] = [];
     for (let type in ServiceType) {

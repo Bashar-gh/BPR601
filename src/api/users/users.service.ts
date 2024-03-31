@@ -35,12 +35,12 @@ export class UsersService {
     return data;
   }
   async makeEmailVerified(id: string): Promise<User> {
-    return this.updateById(id, { accountStatus: UserStatus.AllGood, otpCode: undefined });
+    return this.updateById(id, { accountStatus: UserStatus.AllGood, otpCode: "" });
   }
 
   async setPassword(id: string, password: string): Promise<User> {
     var salts = genSaltSync(1024);
-    return this.updateById(id, { password: hashSync(password, salts), otpCode: undefined });
+    return this.updateById(id, { password: hashSync(password, salts), otpCode: "" });
   }
 
   async findByEmail(email: string): Promise<User[]> {

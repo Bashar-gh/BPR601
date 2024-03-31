@@ -3,6 +3,7 @@ import { FavoriteService } from './favorite.service';
 import { StatusDTO } from 'src/global/models/dtos/status.dto';
 import { JWT_Data } from 'src/auth/types/jwt-data.type';
 import { MyFavorites } from './models/types/my_favorites.type';
+import { ArrayReturn } from 'src/global/models/dtos/return_type.dto';
 
 @Controller('api/favorite')
 export class FavoriteController {
@@ -22,5 +23,10 @@ export class FavoriteController {
     async getFavorites(@Req() request: any): Promise<MyFavorites> {
         let payload: JWT_Data = request.payload;
         return this.favoriteService.getFavorites(payload.userId);
+    }
+    @Get("me/ids")
+    async getFavoritesIds(@Req() request: any): Promise<ArrayReturn<string>> {
+        let payload: JWT_Data = request.payload;
+        return this.favoriteService.getFavoritesIds(payload.userId);
     }
 }
