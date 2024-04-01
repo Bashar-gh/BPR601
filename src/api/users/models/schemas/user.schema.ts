@@ -29,8 +29,6 @@ export class User {
   otpCode: string;
   @Prop({ type: Number, enum: Gender ,required:true })
   gender: Gender
-  @Prop({ type: Date, })
-  dateOfBirth: Date;
   @Prop({ type: String, unique: true, required: true })
   phone: string;
   @Prop({ type: String, enum: Role, default: Role.User })

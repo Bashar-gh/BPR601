@@ -19,6 +19,17 @@ export class FavoriteController {
         let payload: JWT_Data = request.payload;
         return this.favoriteService.makeServiceFav(payload.userId, serviceId);
     }
+    @Put("Notfav/sideOrder")
+    async makeSideOrderNotFav(@Query("sideOrderId") sideOrderId: string, @Req() request: any): Promise<StatusDTO> {
+        let payload: JWT_Data = request.payload;
+
+        return this.favoriteService.makeSideOrderNotFav(payload.userId, sideOrderId);
+    }
+    @Put("Notfav/service")
+    async makeServiceNotFav(@Query("serviceId") serviceId: string,@Req() request: any): Promise<StatusDTO> {
+        let payload: JWT_Data = request.payload;
+        return this.favoriteService.makeServiceNotFav(payload.userId, serviceId);
+    }
     @Get("me")
     async getFavorites(@Req() request: any): Promise<MyFavorites> {
         let payload: JWT_Data = request.payload;

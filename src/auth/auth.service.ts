@@ -63,7 +63,6 @@ export class AuthService {
     newUser.lastName = signUpDTO.lastName;
     newUser.phone = signUpDTO.phone;
     newUser.gender = signUpDTO.gender;
-    newUser.dateOfBirth = new Date(signUpDTO.dateOfBirth);
     newUser.otpCode = this.generateOTPCode();
 
 
@@ -125,7 +124,7 @@ export class AuthService {
     }
 
     let jwt = await this.generateJwtToken({ userId: user.id, accountStatus: user.accountStatus, role: user.type });
-    return { id: user.id, user_email: user.email, display_name: `${user.firstName} ${user.lastName}`,user_bday:user.dateOfBirth.toISOString(),user_phone:user.phone,user_gender:user.gender, jwt: jwt };
+    return { id: user.id, user_email: user.email, display_name: `${user.firstName} ${user.lastName}`,user_phone:user.phone,user_gender:user.gender, jwt: jwt };
 
   }
 }

@@ -17,7 +17,7 @@ export class ReservationsController {
         let payload: JWT_Data = request.payload;
         return this.reservationService.createReservation(dto, payload.userId, serviceId);
     }
-    @Get("")
+    @Get("me")
     async getMyReservations(@Req() request: any,): Promise<ArrayReturn<ReservationListItem>> {
         let payload: JWT_Data = request.payload;
         return this.reservationService.getMyReservations(payload.userId);

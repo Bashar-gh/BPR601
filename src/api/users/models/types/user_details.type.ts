@@ -7,7 +7,6 @@ export type UserDetails = {
     email: string,
     phone: string,
     gender: Gender,
-    dateOfBirth: Date
 };
 export const mapUserDetails = (user: User): UserDetails => {
     return {
@@ -16,6 +15,5 @@ export const mapUserDetails = (user: User): UserDetails => {
         email: user.email,
         phone: user.phone,
         gender: user.gender,
-        dateOfBirth: user.dateOfBirth
     };
 }

@@ -19,7 +19,6 @@ export type SignInResDTO = {
     display_name: string;
     user_email: string;
     user_phone:string;
-    user_bday:string;
     user_gender:Gender;
     jwt: string;
 

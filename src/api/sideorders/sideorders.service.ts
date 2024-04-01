@@ -6,25 +6,39 @@ import { InjectModel } from '@nestjs/mongoose';
 import { mapSideOrderDetails, SideOrderDetails } from './models/types/sideorder_details.type';
 import { CreateSideOrderDTO } from './models/dtos/create_sideorder.dto';
 import NotFound from 'src/global/errors/not_found.error';
+import { ArrayReturn } from 'src/global/models/dtos/return_type.dto';
+import '../../global/extensions/string.extensions';
 type SideOrderPrice = Pick<SideOrder, 'price' | 'id'>;
 @Injectable()
 export class SideordersService {
 
     constructor(@InjectModel(SideOrder.name) private sideOrderModel: Model<SideOrderDocument>) { }
-    async create(dto: CreateSideOrderDTO): Promise<SideOrderDetails> {
+    async create(dto: CreateSideOrderDTO, ownerId: string): Promise<SideOrderDetails> {
         let sideOrder = new this.sideOrderModel({
             ...dto,
+            ownerId: ownerId.toObjectID(),
             reviewSum: { avg: 0, count: 0 }
         });
         let saved = await sideOrder.save();
         return mapSideOrderDetails(saved);
     }
-    async getMostPopular(): Promise<SideOrderListItem[]> {
+    async getMostPopular(): Promise<ArrayReturn<SideOrderListItem>> {
         let topThreeQuery = this.sideOrderModel.find();
         topThreeQuery.sort({ "reviewSum.avg": 1 });
         topThreeQuery.limit(14);
         let topThree = await topThreeQuery.exec();
-        return topThree.map(mapSideOrderItem);
+        return {
+            ARRAY: topThree.map(mapSideOrderItem)
+        };
+    }
+    async getOwner(userId: string): Promise<ArrayReturn<SideOrderListItem>> {
+        let topThreeQuery = this.sideOrderModel.find({ ownerId: userId.toObjectID() });
+        topThreeQuery.sort({ "reviewSum.avg": 1 });
+        
+        let topThree = await topThreeQuery.exec();
+        return {
+            ARRAY: topThree.map(mapSideOrderItem)
+        };
     }
     async getPrices(ids: string[]): Promise<SideOrderPrice[]> {
         let query = this.sideOrderModel.find({ _id: { $in: ids.map((e) => e.toObjectID()) } }).select('price _id');

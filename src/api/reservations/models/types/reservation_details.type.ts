@@ -4,7 +4,6 @@ import { Reservation } from "../schemas/reservation.schema";
 import { mapSideOrderItem, SideOrderListItem } from "src/api/sideorders/models/types/sideorder_list_item.type";
 import { ReservationSideOrder } from "../schemas/reservation_sideorder.schema";
 import { SideOrder } from "src/api/sideorders/models/schema/sideorder.schema";
-import { PaymentMethod } from "src/api/payments/models/enums/payment_method.enum";
 
 export type ReservationDetails = {
     id: string;
@@ -14,7 +13,7 @@ export type ReservationDetails = {
     user_name: string;
     reservable_name: string;
     cost: number;
-    sideOrders: SideOrderListItem[];
+    sideOrders: ReservedSideOrderListItem[];
 }
 export const mapReservationDetails = (e: Reservation): ReservationDetails => {
     let user = e.userId as User;
