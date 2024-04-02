@@ -26,8 +26,7 @@ export class Review {
     rating: number;
     @Prop({ required: true })
     reviewText: string;
-    @Prop({ required: true })
-    createdAt: Date;
+    date: Date;
 
 }
 
@@ -42,3 +41,4 @@ ReviewSchema.path('sideOrderId').validate(function (value) {
 }, 'Either serviceId or sideOrderId must have a value, not both');
 
 MongooseMiddlewareHelper.setupMappingMiddlewares(ReviewSchema);
+MongooseMiddlewareHelper.setupMappingMiddlewaresDate(ReviewSchema);

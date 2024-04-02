@@ -10,5 +10,5 @@ export type ReviewListItem = {
 };
 export const mapReviewListItem = (rev: Review) => {
     let user = rev.userId as User;
-    return { id: rev.id, name: `${user.firstName} ${user.lastName}`, rating: rev.rating, date: rev.createdAt, details: rev.reviewText };
+    return { id: rev.id, name: `${user.firstName} ${user.lastName}`, rating: rev.rating, date: rev.date, details: rev.reviewText };
 };
