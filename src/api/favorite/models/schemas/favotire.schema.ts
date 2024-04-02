@@ -20,8 +20,6 @@ export class Favorite {
 }
 
 export const FavoriteSchema = SchemaFactory.createForClass(Favorite);
-FavoriteSchema.index({ userId: 1, serviceId: 1 }, { unique: true });
-FavoriteSchema.index({ userId: 1, sideOrderId: 1 }, { unique: true });
 // Ensure that either serviceId or sideOrderId has a value, but not both
 FavoriteSchema.path('serviceId').validate(function (value) {
   return (value || this.sideOrderId); // Returns false if both serviceId and sideOrderId have values

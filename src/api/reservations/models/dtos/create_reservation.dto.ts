@@ -1,10 +1,13 @@
-import { IsArray, IsDate, IsEnum, IsNotEmpty, IsNumber, IsString, Max, Min, ValidateNested } from "class-validator";
+import { Transform } from "class-transformer";
+import { IsArray, IsDate, IsDateString, IsEnum, IsNotEmpty, IsNumber, IsString, Max, Min, ValidateNested } from "class-validator";
 import { PaymentMethod } from "src/api/payments/models/enums/payment_method.enum";
 
 export class CreateReservationDTO {
 
     @IsNotEmpty()
-    @IsDate()
+    @Transform((params)=>{
+        return new Date(params.value);
+    })
     date: Date;
     @IsNotEmpty()
     @IsNumber()
@@ -14,7 +17,7 @@ export class CreateReservationDTO {
     @IsNotEmpty()
     @IsNumber()
     @Min(0)
-    @Max(4)
+    @Max(21-9)
     duration: number;
     @IsNotEmpty()
     @IsNumber()
@@ -22,7 +25,6 @@ export class CreateReservationDTO {
     capacity: number;
     @IsNotEmpty()
     @IsArray()
-    @ValidateNested()
     sideOrders: ReservationSideOrderDTO[];
     
     @IsNotEmpty()

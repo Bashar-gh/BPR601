@@ -4,6 +4,7 @@ import { Reservation } from "../schemas/reservation.schema";
 import { mapSideOrderItem, SideOrderListItem } from "src/api/sideorders/models/types/sideorder_list_item.type";
 import { ReservationSideOrder } from "../schemas/reservation_sideorder.schema";
 import { SideOrder } from "src/api/sideorders/models/schema/sideorder.schema";
+import { ServiceType } from "src/api/reservable/models/enum/service_type.enum";
 
 export type ReservationDetails = {
     id: string;
@@ -13,6 +14,8 @@ export type ReservationDetails = {
     user_name: string;
     reservable_name: string;
     cost: number;
+    image:number,
+    type:ServiceType,
     sideOrders: ReservedSideOrderListItem[];
 }
 export const mapReservationDetails = (e: Reservation): ReservationDetails => {
@@ -24,7 +27,12 @@ export const mapReservationDetails = (e: Reservation): ReservationDetails => {
 
     }
     return {
-        ...e,
+        id: e.id,
+        date: e.date,
+        time: e.time,
+        duration: e.duration,
+        type:reservable.serviceType,
+        image:reservable.image,
         user_name: `${user.firstName} ${user.lastName}`,
         reservable_name: reservable.name,
         cost: cost,

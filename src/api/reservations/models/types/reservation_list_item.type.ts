@@ -21,7 +21,11 @@ export const mapReservationListItem = (e:Reservation):ReservationListItem =>{
         
     }
     return {
-        ...e,
+        id:e.id,
+        date:e.date,
+        time:e.time,
+        duration:e.duration,
+
         user_name:`${user.firstName} ${user.lastName}`,
         reservable_name:reservable.name,
         cost:cost

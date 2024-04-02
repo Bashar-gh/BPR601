@@ -15,6 +15,7 @@ import { ReservationSideOrder } from './models/schemas/reservation_sideorder.sch
 import { ReservableService } from '../reservable/reservable.service';
 import { mapReservableDetails } from '../reservable/models/types/reservable_details.type';
 import NotFound from 'src/global/errors/not_found.error';
+import { SideOrder } from '../sideorders/models/schema/sideorder.schema';
 type MainReservationData = Omit<CreateReservationDTO, 'payment_method' | 'sideOrders'>
 @Injectable()
 export class ReservationsService {
@@ -34,7 +35,7 @@ export class ReservationsService {
         const capacity = await this.reservableService.getCapacity(serviceId);
         const usedCapacity = await this.usedCapForService(serviceId, dto.date);
         let leftCapacity = capacity - usedCapacity;
-        if (dto.capacity < leftCapacity) {
+        if (dto.capacity > leftCapacity) {
             throw new Error("No Place Available ");
         }
         for (let order of dto.sideOrders) {
@@ -48,8 +49,8 @@ export class ReservationsService {
         }
 
         let data = new this.reservationModel({
-            userId: userId,
-            reservableId: serviceId,
+            userId: userId.toObjectID(),
+            reservableId: serviceId.toObjectID(),
             price: servicePrice,
             ...mainData,
 
@@ -61,7 +62,21 @@ export class ReservationsService {
         return this.getReservationDetails(saved.id);
     }
     async getMyReservations(userId: string): Promise<ArrayReturn<ReservationListItem>> {
-        let reservations = await this.reservationModel.find({ userId: userId.toObjectID() }).exec();
+        let query = this.reservationModel.find({ userId: userId.toObjectID() });
+        query.populate('userId');
+        query.populate('reservableId');
+        let reservations = await query.exec();
+        return {
+            ARRAY: reservations.map(mapReservationListItem)
+        };
+    }
+    async getMyReservationsOwner(userId: string): Promise<ArrayReturn<ReservationListItem>> {
+        let services = await this.reservableService.getOwner(userId);
+        var ids = services.ARRAY.map((e) => e.id.toObjectID());
+        let query = this.reservationModel.find({ reservableId: { $in: ids }  });
+        query.populate('userId');
+        query.populate('reservableId');
+        let reservations = await query.exec();
         return {
             ARRAY: reservations.map(mapReservationListItem)
         };
@@ -70,6 +85,10 @@ export class ReservationsService {
         let query = this.reservationModel.findById(reservationId);
         query.populate('userId');
         query.populate('reservableId');
+        query.populate({
+            path: "sideOrders.sideOrderId",
+            model: SideOrder.name
+        });
         let data = await query.exec();
         if (!data) {
             throw new NotFound(Reservation);
@@ -138,6 +157,11 @@ export class ReservationsService {
         }
         for (let i = this.startHour; i <= this.endHour; i++) {
             if (!reservations.find(reservation => reservation.time === i || reservation.time + reservation.duration >= i)) {
+                var index = availableSlots.findIndex((e) => e.endTime == i);
+                if (index != -1) {
+                    availableSlots[index].endTime = i + 1
+                    continue;
+                }
                 availableSlots.push({ startTime: i, endTime: i + 1 });
             }
         }
