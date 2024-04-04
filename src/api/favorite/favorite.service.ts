@@ -6,6 +6,8 @@ import { StatusDTO } from 'src/global/models/dtos/status.dto';
 import '../../global/extensions/string.extensions';
 import { mapMyFavorites, MyFavorites } from './models/types/my_favorites.type';
 import { ArrayReturn } from 'src/global/models/dtos/return_type.dto';
+import { mapUserListItem, UserListItem } from '../users/models/types/user_list_item.type';
+import { User } from '../users/models/schemas/user.schema';
 
 @Injectable()
 export class FavoriteService {
@@ -43,6 +45,14 @@ export class FavoriteService {
         query.populate("sideOrderId");
         let data = await query.exec();
         return mapMyFavorites(data);
+    }
+    async getUsersFavorited(serviceId?: string, sideOrderId?: string): Promise<ArrayReturn<UserListItem>> {
+        let query = this.favoriteModel.find({ serviceId: serviceId?.toObjectID(), sideOrderId: sideOrderId?.toObjectID(), });
+        query.populate("userId");
+        let data = await query.exec();
+        return {
+            ARRAY: data.map((e) => mapUserListItem(e.userId as User)),
+        };
     }
     async getFavoritesIds(userId: string): Promise<ArrayReturn<string>> {
         let query = this.favoriteModel.find({ userId: userId.toObjectID() }).select('_id');

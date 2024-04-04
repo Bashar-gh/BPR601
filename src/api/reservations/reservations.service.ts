@@ -16,6 +16,7 @@ import { ReservableService } from '../reservable/reservable.service';
 import { mapReservableDetails } from '../reservable/models/types/reservable_details.type';
 import NotFound from 'src/global/errors/not_found.error';
 import { SideOrder } from '../sideorders/models/schema/sideorder.schema';
+import { StatusDTO } from 'src/global/models/dtos/status.dto';
 type MainReservationData = Omit<CreateReservationDTO, 'payment_method' | 'sideOrders'>
 @Injectable()
 export class ReservationsService {
@@ -73,7 +74,7 @@ export class ReservationsService {
     async getMyReservationsOwner(userId: string): Promise<ArrayReturn<ReservationListItem>> {
         let services = await this.reservableService.getOwner(userId);
         var ids = services.ARRAY.map((e) => e.id.toObjectID());
-        let query = this.reservationModel.find({ reservableId: { $in: ids }  });
+        let query = this.reservationModel.find({ reservableId: { $in: ids } });
         query.populate('userId');
         query.populate('reservableId');
         let reservations = await query.exec();
@@ -170,7 +171,11 @@ export class ReservationsService {
             ARRAY: availableSlots,
         };
     }
-
+    async cancelReservation(id: string): Promise<StatusDTO> {
+        await this.reservationModel.findByIdAndDelete(id);
+        return { Status: true };
+    }
+    
     private async getReservationsForDay(serviceId: string, day: Date): Promise<Reservation[]> {
         return this.reservationModel.find({
             reservableId: serviceId.toObjectID(),
@@ -190,5 +195,6 @@ export class ReservationsService {
         }
         return used;
     }
+
 
 }

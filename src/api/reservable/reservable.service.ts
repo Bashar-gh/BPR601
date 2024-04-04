@@ -9,6 +9,7 @@ import { CreateReservableDTO } from './models/dtos/create_reservable.dto';
 import NotFound from 'src/global/errors/not_found.error';
 import '../../global/extensions/string.extensions';
 import { ArrayReturn } from 'src/global/models/dtos/return_type.dto';
+import { StatusDTO } from 'src/global/models/dtos/status.dto';
 
 @Injectable()
 export class ReservableService {
@@ -55,14 +56,14 @@ export class ReservableService {
     }
     return reservables.capacity;
   }
-  async updateReviewSum(id: string,avg:number,count:number): Promise<boolean> {
-   await this.reservableModel.findByIdAndUpdate(id,{reviewSum:{avg:avg,count:count}}).exec();
+  async updateReviewSum(id: string, avg: number, count: number): Promise<boolean> {
+    await this.reservableModel.findByIdAndUpdate(id, { reviewSum: { avg: avg, count: count } }).exec();
     return true;
   }
   async getTopRatedReservables(): Promise<ArrayReturn<ReservableListItem>> {
     let topRatedReservables: ReservableListItem[] = [];
     let type: keyof typeof ServiceType;
-    for ( type in ServiceType) {
+    for (type in ServiceType) {
       let topThreeQuery = this.reservableModel.find({ serviceType: ServiceType[type] });
       topThreeQuery.sort({ "reviewSum.avg": 1 });
       topThreeQuery.limit(3);
@@ -79,4 +80,23 @@ export class ReservableService {
     return mapReservableDetails(data);
   }
 
+  async deleteService(id: String): Promise<StatusDTO> {
+    await this.reservableModel.findByIdAndDelete(id);
+    return { Status: true };
+  }
+  async getAll(): Promise<ArrayReturn<ReservableListItem>> {
+    let allQuery = this.reservableModel.find();
+    allQuery.sort({ "reviewSum.avg": -1 });
+
+    let all = await allQuery.exec();
+    return { ARRAY: all.map(mapReservableItem) };
+  }
+  async updateService(id: string, dto: CreateReservableDTO, ownerId?: string): Promise<ReservableDetails> {
+    let reservable = new this.reservableModel({
+      ...dto,
+      ownerId: ownerId?.toObjectID(),
+    });
+    let saved = await reservable.save();
+    return mapReservableDetails(saved);
+  }
 }

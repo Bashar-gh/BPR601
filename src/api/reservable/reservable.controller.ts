@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
 import { ReservableService } from './reservable.service';
 import { ReservableListItem } from './models/types/reservable_list_item';
 import { ServiceType } from './models/enum/service_type.enum';
@@ -8,6 +8,7 @@ import { Roles } from 'src/auth/decorators/role.decorator';
 import { Role } from 'src/auth/enums/role.enum';
 import { JWT_Data } from 'src/auth/types/jwt-data.type';
 import { ArrayReturn } from 'src/global/models/dtos/return_type.dto';
+import { StatusDTO } from 'src/global/models/dtos/status.dto';
 
 @Controller('api/reservable')
 export class ReservableController {
@@ -21,10 +22,11 @@ export class ReservableController {
     async getByType(@Query("type") type: ServiceType): Promise<ArrayReturn<ReservableListItem>> {
         return this.reservableService.getByType(type);
     }
+    @Roles(Role.Owner, Role.Admin)
     @Get("type/me")
-    async getByTypeOWner(@Query("type") type: ServiceType,@Req() request:any): Promise<ArrayReturn<ReservableListItem>> {
-        let payload:JWT_Data = request.payload;
-        return this.reservableService.getByType(type,payload.userId);
+    async getByTypeOWner(@Query("type") type: ServiceType, @Req() request: any): Promise<ArrayReturn<ReservableListItem>> {
+        let payload: JWT_Data = request.payload;
+        return this.reservableService.getByType(type, payload.userId);
     }
     @Get('details/:id')
     async getDetails(@Param("id") id: string): Promise<ReservableDetails> {
@@ -32,14 +34,32 @@ export class ReservableController {
     }
     @Roles(Role.Owner, Role.Admin)
     @Get('me')
-    async getOWner(@Req() request:any): Promise<ArrayReturn<ReservableListItem>> {
-        let payload:JWT_Data = request.payload;
+    async getOWner(@Req() request: any): Promise<ArrayReturn<ReservableListItem>> {
+        let payload: JWT_Data = request.payload;
         return this.reservableService.getOwner(payload.userId);
     }
     @Roles(Role.Owner, Role.Admin)
     @Post("")
-    async create(@Body() dto: CreateReservableDTO,@Req() request:any): Promise<ReservableDetails> {
-        let payload:JWT_Data = request.payload;
-        return this.reservableService.create(dto,payload.userId);
+    async create(@Body() dto: CreateReservableDTO, @Req() request: any): Promise<ReservableDetails> {
+        let payload: JWT_Data = request.payload;
+        return this.reservableService.create(dto, payload.userId);
     }
+    @Roles(Role.Admin)
+    @Delete(":id")
+    async deleteService(@Param("id") id: String): Promise<StatusDTO> {
+        return this.reservableService.deleteService(id);
+    }
+    @Roles(Role.Admin)
+    @Get("")
+    async getAll(): Promise<ArrayReturn<ReservableListItem>> {
+        return this.reservableService.getAll();
+    }
+    @Roles(Role.Admin)
+    @Put(":id")
+    async updateService(@Param("id") id: string,@Body() dto: CreateReservableDTO,@Query("ownerId") ownerId?: string): Promise<ReservableDetails> {
+        return this.reservableService.updateService(id, dto, ownerId);
+    }
+
+
+
 }
