@@ -1,4 +1,5 @@
 import { Gender } from "../../enums/gender.enum";
+import { UserStatus } from "../../enums/user-status.enum";
 import { User } from "../schemas/user.schema";
 
 export type UserDetails = {
@@ -7,6 +8,7 @@ export type UserDetails = {
     email: string,
     phone: string,
     gender: Gender,
+    status:UserStatus
 };
 export const mapUserDetails = (user: User): UserDetails => {
     return {
@@ -15,5 +17,6 @@ export const mapUserDetails = (user: User): UserDetails => {
         email: user.email,
         phone: user.phone,
         gender: user.gender,
+        status:user.accountStatus,
     };
 }

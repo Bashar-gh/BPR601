@@ -6,6 +6,9 @@ import { UserStatus } from "./enums/user-status.enum";
 import { genSaltSync, hashSync } from "bcrypt";
 import { mapUserDetails, UserDetails } from "./models/types/user_details.type";
 import NotFound from "src/global/errors/not_found.error";
+import { ArrayReturn } from "src/global/models/dtos/return_type.dto";
+import { mapUserListItem, UserListItem } from "./models/types/user_list_item.type";
+import { StatusDTO } from "src/global/models/dtos/status.dto";
 
 @Injectable()
 export class UsersService {
@@ -19,6 +22,18 @@ export class UsersService {
     return mapUserDetails(data);
 
   }
+  async disableUser(id: string): Promise<StatusDTO> {
+   let data =  await this.userModel.findByIdAndUpdate(id, { accountStatus: UserStatus.Disabled },{new:true});
+    return { Status: data?.accountStatus ==   UserStatus.Disabled };
+
+  }
+  async getUserList(): Promise<ArrayReturn<UserListItem>> {
+    let data = await this.findAll();
+    return {
+      ARRAY: data.map(mapUserListItem),
+    };
+
+  }
   async findById(id: string): Promise<User> {
 
     let data = await this.userModel.findById(id).exec();
@@ -27,6 +42,7 @@ export class UsersService {
     }
     return data;
   }
+
   async updateById(id: string, userData: Partial<User>): Promise<User> {
     let data = await this.userModel.findByIdAndUpdate(id, userData, { new: true }).exec();
     if (!data) {

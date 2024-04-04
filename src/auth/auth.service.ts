@@ -37,13 +37,14 @@ export class AuthService {
     if (!compareSync(signInDTO.password, user.password)) {
       throw new IncorrectUserCredentials();
     }
+   
     return this._loginUser(user);
 
   }
   async refresh(payload: JWT_Data): Promise<SignInResDTO> {
 
     const user = await this.usersService.findById(payload.userId);
-
+    
 
     return this._loginUser(user);
 
@@ -53,10 +54,10 @@ export class AuthService {
     if (users.length != 0) {
       throw new UserAlreadyExists();
     }
-    if(signUpDTO.role == Role.Admin){
+    if (signUpDTO.role == Role.Admin) {
       throw new NotAutherized();
     }
-    var newUser:User = new User();
+    var newUser: User = new User();
     newUser.email = signUpDTO.email;
     newUser.password = signUpDTO.password;
     newUser.firstName = signUpDTO.firstName;
@@ -122,9 +123,12 @@ export class AuthService {
     } else {
       await this.usersService.updateById(user.id, { otpCode: undefined });
     }
+    if (user.accountStatus == UserStatus.Disabled) {
+      throw new NotAutherized();
+    }
 
     let jwt = await this.generateJwtToken({ userId: user.id, accountStatus: user.accountStatus, role: user.type });
-    return { id: user.id, user_email: user.email, display_name: `${user.firstName} ${user.lastName}`,user_phone:user.phone,user_gender:user.gender, jwt: jwt };
+    return { id: user.id, user_email: user.email, display_name: `${user.firstName} ${user.lastName}`, user_phone: user.phone, user_gender: user.gender, jwt: jwt };
 
   }
 }

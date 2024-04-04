@@ -9,7 +9,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
         MailerModule.forRootAsync({
             imports: [ConfigModule],
             inject: [ConfigService],
-            
+
             useFactory: (configService: ConfigService) => {
                 return {
                     transport: {
@@ -21,7 +21,7 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
                         },
                     },
                     defaults: {
-                        from:`"No Reply" <${configService.get("FROM")}>` ,
+                        from: `"No Reply" <${configService.get("FROM")}>`,
                     },
                 };
             }
