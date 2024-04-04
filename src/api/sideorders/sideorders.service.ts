@@ -24,17 +24,20 @@ export class SideordersService {
     }
     async getMostPopular(): Promise<ArrayReturn<SideOrderListItem>> {
         let topThreeQuery = this.sideOrderModel.find();
-        topThreeQuery.sort({ "reviewSum.avg": 1 });
+        topThreeQuery.sort({ "reviewSum.avg": -1 });
         topThreeQuery.limit(14);
         let topThree = await topThreeQuery.exec();
         return {
             ARRAY: topThree.map(mapSideOrderItem)
         };
+    } async updateReviewSum(id: string, avg: number, count: number): Promise<boolean> {
+        await this.sideOrderModel.findByIdAndUpdate(id, { reviewSum: { avg: avg, count: count } }).exec();
+        return true;
     }
     async getOwner(userId: string): Promise<ArrayReturn<SideOrderListItem>> {
         let topThreeQuery = this.sideOrderModel.find({ ownerId: userId.toObjectID() });
         topThreeQuery.sort({ "reviewSum.avg": 1 });
-        
+
         let topThree = await topThreeQuery.exec();
         return {
             ARRAY: topThree.map(mapSideOrderItem)

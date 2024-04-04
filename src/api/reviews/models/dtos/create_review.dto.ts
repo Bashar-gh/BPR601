@@ -11,6 +11,6 @@ export class CreateReviewDTO {
     rating: number;
     @IsNotEmpty()
     @IsString()
-    @MaxLength(80)
+    @MaxLength(240)
     reviewText: string;
 }

@@ -29,12 +29,8 @@ export class SignUpReqDTO {
     gender: Gender;
     @IsNotEmpty()
     @IsEnum(Role)
-    
     role: Role;
 
-    @IsNotEmpty()
-    @IsDateString()
-    dateOfBirth: string;
 
 
 }

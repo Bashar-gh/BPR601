@@ -55,6 +55,10 @@ export class ReservableService {
     }
     return reservables.capacity;
   }
+  async updateReviewSum(id: string,avg:number,count:number): Promise<boolean> {
+   await this.reservableModel.findByIdAndUpdate(id,{reviewSum:{avg:avg,count:count}}).exec();
+    return true;
+  }
   async getTopRatedReservables(): Promise<ArrayReturn<ReservableListItem>> {
     let topRatedReservables: ReservableListItem[] = [];
     let type: keyof typeof ServiceType;

@@ -25,7 +25,7 @@ export class ReservationsController {
     @Get("Owner/me")
     async getMyReservationsOwner(@Req() request: any,): Promise<ArrayReturn<ReservationListItem>> {
         let payload: JWT_Data = request.payload;
-        return this.reservationService.getMyReservations(payload.userId);
+        return this.reservationService.getMyReservationsOwner(payload.userId);
     }
     @Get(":serviceId")
     async getReservationDetails(@Param("serviceId") reservableId: string): Promise<ReservationDetails> {
