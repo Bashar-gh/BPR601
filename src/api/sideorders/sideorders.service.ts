@@ -8,6 +8,7 @@ import { CreateSideOrderDTO } from './models/dtos/create_sideorder.dto';
 import NotFound from 'src/global/errors/not_found.error';
 import { ArrayReturn } from 'src/global/models/dtos/return_type.dto';
 import '../../global/extensions/string.extensions';
+import { StatusDTO } from 'src/global/models/dtos/status.dto';
 type SideOrderPrice = Pick<SideOrder, 'price' | 'id'>;
 @Injectable()
 export class SideordersService {
@@ -36,7 +37,7 @@ export class SideordersService {
     }
     async getOwner(userId: string): Promise<ArrayReturn<SideOrderListItem>> {
         let topThreeQuery = this.sideOrderModel.find({ ownerId: userId.toObjectID() });
-        topThreeQuery.sort({ "reviewSum.avg": 1 });
+        topThreeQuery.sort({ "reviewSum.avg": -1 });
 
         let topThree = await topThreeQuery.exec();
         return {
@@ -49,11 +50,34 @@ export class SideordersService {
         return data;
     }
     async getDetails(id: string): Promise<SideOrderDetails> {
-        let data = await this.sideOrderModel.findById(id);
+        let data = await this.sideOrderModel.findById(id).exec();
         if (!data) {
             throw new NotFound(SideOrder);
         }
         return mapSideOrderDetails(data);
+    }
+    async getAll(): Promise<ArrayReturn<SideOrderListItem>> {
+        let topThreeQuery = this.sideOrderModel.find();
+        topThreeQuery.sort({ "reviewSum.avg": -1 });
+
+        let topThree = await topThreeQuery.exec();
+        return {
+            ARRAY: topThree.map(mapSideOrderItem)
+        };
+    }
+    async deleteSideOrder(id: string): Promise<StatusDTO> {
+        await this.sideOrderModel.findByIdAndDelete(id).exec();
+        return { Status: true };
+    }
+    async update(id: string, dto: CreateSideOrderDTO, ownerId?: string): Promise<SideOrderDetails> {
+        let sideOrder = await this.sideOrderModel.findByIdAndUpdate(id, {
+            ...dto,
+            ownerId: ownerId?.toObjectID(),
+        }, { new: true }).exec();
+        if (!sideOrder) {
+            throw new NotFound(SideOrder);
+        }
+        return mapSideOrderDetails(sideOrder);
     }
 
 }
