@@ -19,7 +19,7 @@ export class ReservableController {
         return this.reservableService.getTopRatedReservables();
     }
     @Get("type")
-    async getByType(@Query("type") type: ServiceType): Promise<ArrayReturn<ReservableListItem>> {
+    async getByType(@Query("type") type?: ServiceType): Promise<ArrayReturn<ReservableListItem>> {
         return this.reservableService.getByType(type);
     }
     @Roles(Role.Owner, Role.Admin)

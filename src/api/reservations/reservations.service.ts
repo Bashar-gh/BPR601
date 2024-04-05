@@ -82,6 +82,15 @@ export class ReservationsService {
             ARRAY: reservations.map(mapReservationListItem)
         };
     }
+    async getAll(): Promise<ArrayReturn<ReservationListItem>> {
+        let query = this.reservationModel.find( );
+        query.populate('userId');
+        query.populate('reservableId');
+        let reservations = await query.exec();
+        return {
+            ARRAY: reservations.map(mapReservationListItem)
+        };
+    }
     async getReservationDetails(reservationId: string): Promise<ReservationDetails> {
         let query = this.reservationModel.findById(reservationId);
         query.populate('userId');

@@ -15,7 +15,7 @@ import { StatusDTO } from 'src/global/models/dtos/status.dto';
 export class ReservationsController {
 
     constructor(private reservationService: ReservationsService) { }
-    @Roles(Role.User,Role.Admin)
+   
     @Post(":serviceId")
     async createReservation(@Body() dto: CreateReservationDTO, @Req() request: any, @Param('serviceId') serviceId: string): Promise<ReservationDetails> {
         let payload: JWT_Data = request.payload;
@@ -33,9 +33,14 @@ export class ReservationsController {
         let payload: JWT_Data = request.payload;
         return this.reservationService.getMyReservationsOwner(payload.userId);
     }
-    @Get(":serviceId")
-    async getReservationDetails(@Param("serviceId") reservableId: string): Promise<ReservationDetails> {
-        return this.reservationService.getReservationDetails(reservableId);
+    @Roles(Role.Admin)
+    @Get("")
+    async getAll(): Promise<ArrayReturn<ReservationListItem>> {
+        return this.reservationService.getAll();
+    }
+    @Get(":reservationId")
+    async getReservationDetails(@Param("reservationId") reservationId: string): Promise<ReservationDetails> {
+        return this.reservationService.getReservationDetails(reservationId);
     }
     @Get("week/:serviceId")
     async getDaysWithAvailableTime(@Param("serviceId") reservableId: string): Promise<ArrayReturn<AvailableDay>> {

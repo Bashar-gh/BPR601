@@ -9,12 +9,13 @@ import NotFound from "src/global/errors/not_found.error";
 import { ArrayReturn } from "src/global/models/dtos/return_type.dto";
 import { mapUserListItem, UserListItem } from "./models/types/user_list_item.type";
 import { StatusDTO } from "src/global/models/dtos/status.dto";
+import { Role } from "src/auth/enums/role.enum";
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) { }
   async findAll(): Promise<User[]> {
-    return this.userModel.find().exec();
+    return this.userModel.find({ type: { $ne: Role.Admin } }).exec();
   }
 
   async getDetails(id: string): Promise<UserDetails> {
@@ -23,8 +24,8 @@ export class UsersService {
 
   }
   async disableUser(id: string): Promise<StatusDTO> {
-   let data =  await this.userModel.findByIdAndUpdate(id, { accountStatus: UserStatus.Disabled },{new:true});
-    return { Status: data?.accountStatus ==   UserStatus.Disabled };
+    let data = await this.userModel.findByIdAndUpdate(id, { accountStatus: UserStatus.Disabled }, { new: true });
+    return { Status: data?.accountStatus == UserStatus.Disabled };
 
   }
   async getUserList(): Promise<ArrayReturn<UserListItem>> {

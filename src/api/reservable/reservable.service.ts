@@ -25,8 +25,8 @@ export class ReservableService {
     let saved = await reservable.save();
     return mapReservableDetails(saved);
   }
-  async getByType(type: ServiceType, userId?: string): Promise<ArrayReturn<ReservableListItem>> {
-    let query = this.reservableModel.find({ serviceType: type });
+  async getByType(type?: ServiceType, userId?: string): Promise<ArrayReturn<ReservableListItem>> {
+    let query = this.reservableModel.find(type==undefined?{}:{ serviceType: type });
     if (userId) {
       query.find({ ownerId: userId.toObjectID() });
     }
