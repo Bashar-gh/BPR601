@@ -30,6 +30,10 @@ export class UsersController {
     async disableUser(@Param('id') userId: string): Promise<StatusDTO> {
         return this.usersService.disableUser(userId);
     }
+    @Put('enable/:id')
+    async enableUser(@Param('id') userId: string): Promise<StatusDTO> {
+        return this.usersService.enableUser(userId);
+    }
 
     @Roles(Role.Owner, Role.User)
     @Get('me')

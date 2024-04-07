@@ -28,6 +28,11 @@ export class UsersService {
     return { Status: data?.accountStatus == UserStatus.Disabled };
 
   }
+  async enableUser(id: string): Promise<StatusDTO> {
+    let data = await this.userModel.findByIdAndUpdate(id, { accountStatus: UserStatus.AllGood }, { new: true });
+    return { Status: data?.accountStatus == UserStatus.AllGood };
+
+  }
   async getUserList(): Promise<ArrayReturn<UserListItem>> {
     let data = await this.findAll();
     return {
