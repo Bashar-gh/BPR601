@@ -207,6 +207,22 @@ export class ReservationsService {
 
         return { Status: true };
     }
+    async removeSideOrder(id: string, orderId: string): Promise<StatusDTO> {
+        let reservation = await this.reservationModel.findById(id).exec();
+        if (!reservation) {
+            throw new NotFound(Reservation);
+        }
+        let index = reservation.sideOrders.findIndex((e) => e.sideOrderId.toString() == orderId.toString());
+        let order = reservation.sideOrders[index];
+        let discount = order.count * order.price;
+        reservation.price = reservation.price - discount;
+        reservation.sideOrders.splice(index, 1);
+        await reservation.save();
+
+
+
+        return { Status: true };
+    }
 
     private async getReservationsForDay(serviceId: string, day: Date): Promise<Reservation[]> {
         return this.reservationModel.find({

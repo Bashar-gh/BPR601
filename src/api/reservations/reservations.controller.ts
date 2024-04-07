@@ -56,4 +56,9 @@ export class ReservationsController {
     async cancelReservation(@Param('id')id: string): Promise<StatusDTO> {
         return this.reservationService.cancelReservation(id);
     }
+    @Roles(Role.Admin)
+    @Delete("removeOrder/:id/:orderId")
+    async removeOrder(@Param('id')id: string,@Param("orderId") orderId:string): Promise<StatusDTO> {
+        return this.reservationService.removeSideOrder(id,orderId);
+    }
 }
