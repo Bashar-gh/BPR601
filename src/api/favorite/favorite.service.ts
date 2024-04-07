@@ -47,7 +47,14 @@ export class FavoriteService {
         return mapMyFavorites(data);
     }
     async getUsersFavorited(serviceId?: string, sideOrderId?: string): Promise<ArrayReturn<UserListItem>> {
-        let query = this.favoriteModel.find({ serviceId: serviceId?.toObjectID(), sideOrderId: sideOrderId?.toObjectID(), });
+        let find:any = {};
+        if(serviceId){
+            find.serviceId =serviceId.toObjectID();
+        }
+        if(sideOrderId){
+            find.sideOrderId =sideOrderId.toObjectID();
+        }
+        let query = this.favoriteModel.find(find);
         query.populate("userId");
         let data = await query.exec();
         return {

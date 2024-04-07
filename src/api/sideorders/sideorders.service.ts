@@ -79,6 +79,15 @@ export class SideordersService {
         }
         return mapSideOrderDetails(sideOrder);
     }
+    async changeOwner(id: string,ownerId: string): Promise<SideOrderDetails> {
+        let sideOrder = await this.sideOrderModel.findByIdAndUpdate(id, {
+            ownerId: ownerId.toObjectID(),
+        }, { new: true }).exec();
+        if (!sideOrder) {
+            throw new NotFound(SideOrder);
+        }
+        return mapSideOrderDetails(sideOrder);
+    }
 
 }
 

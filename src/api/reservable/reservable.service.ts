@@ -26,7 +26,7 @@ export class ReservableService {
     return mapReservableDetails(saved);
   }
   async getByType(type?: ServiceType, userId?: string): Promise<ArrayReturn<ReservableListItem>> {
-    let query = this.reservableModel.find(type==undefined?{}:{ serviceType: type });
+    let query = this.reservableModel.find(type == undefined ? {} : { serviceType: type });
     if (userId) {
       query.find({ ownerId: userId.toObjectID() });
     }
@@ -91,12 +91,19 @@ export class ReservableService {
     let all = await allQuery.exec();
     return { ARRAY: all.map(mapReservableItem) };
   }
-  async updateService(id: string, dto: CreateReservableDTO, ownerId?: string): Promise<ReservableDetails> {
-    let reservable = new this.reservableModel({
-      ...dto,
-      ownerId: ownerId?.toObjectID(),
-    });
-    let saved = await reservable.save();
-    return mapReservableDetails(saved);
+  async updateService(id: string, dto: CreateReservableDTO): Promise<ReservableDetails> {
+    let reservable = await this.reservableModel.findByIdAndUpdate(id, dto, { new: true }).exec();
+    if (!reservable) {
+      throw new NotFound(Reservable);
+  }
+    return mapReservableDetails(reservable);
+  }
+  async changeOwner(id: string, ownerId: string): Promise<ReservableDetails> {
+  
+    let reservable = await this.reservableModel.findByIdAndUpdate(id, {   ownerId: ownerId.toObjectID(),}, { new: true }).exec();
+    if (!reservable) {
+      throw new NotFound(Reservable);
+  }
+    return mapReservableDetails(reservable);
   }
 }

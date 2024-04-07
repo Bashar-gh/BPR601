@@ -47,4 +47,8 @@ export class SideordersController {
     async update(@Param("id") id: string, @Body() dto: CreateSideOrderDTO, @Query('ownerId') ownerId?: string): Promise<SideOrderDetails> {
         return this.sideOrderService.update(id, dto, ownerId);
     }
+    @Put('changeOwner/:id/:ownerId')
+    async changeOwner(@Param("id") id: string, @Param('ownerId') ownerId: string): Promise<SideOrderDetails> {
+        return this.sideOrderService.changeOwner(id, ownerId);
+    }
 }

@@ -56,10 +56,14 @@ export class ReservableController {
     }
     @Roles(Role.Admin)
     @Put(":id")
-    async updateService(@Param("id") id: string,@Body() dto: CreateReservableDTO,@Query("ownerId") ownerId?: string): Promise<ReservableDetails> {
-        return this.reservableService.updateService(id, dto, ownerId);
+    async updateService(@Param("id") id: string,@Body() dto: CreateReservableDTO): Promise<ReservableDetails> {
+        return this.reservableService.updateService(id, dto);
     }
 
-
+    @Roles(Role.Admin)
+    @Put("changeOwner/:id/:ownerId")
+    async changeOwner(@Param("id") id: string,@Param("ownerId") ownerId: string): Promise<ReservableDetails> {
+        return this.reservableService.changeOwner(id, ownerId);
+    }
 
 }

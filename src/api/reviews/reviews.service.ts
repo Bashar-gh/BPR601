@@ -51,9 +51,13 @@ export class ReviewsService {
         };
     }
     async deleteReview(id: string): Promise<StatusDTO> {
-        await this.reviewModel.findByIdAndDelete(id);
+       let review =  await this.reviewModel.findByIdAndDelete(id);
+       let status = await this.updateAvrage({
+        serviceId: review?.serviceId?.toString(),
+        sideOrderId: review?.sideOrderId?.toString(),
+    });
         return {
-            Status: true,
+            Status: status,
         };
     }
     async editReview(id: string, dto: CreateReviewDTO): Promise<StatusDTO> {
@@ -62,8 +66,8 @@ export class ReviewsService {
             reviewText: dto.reviewText,
         }, { new: true });
         let status = await this.updateAvrage({
-            serviceId: result?.serviceId.toString(),
-            sideOrderId: result?.sideOrderId.toString(),
+            serviceId: result?.serviceId?.toString(),
+            sideOrderId: result?.sideOrderId?.toString(),
         });
         return {
             Status: status,

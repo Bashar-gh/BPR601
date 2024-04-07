@@ -22,7 +22,10 @@ export class UsersController {
     async getList(): Promise<ArrayReturn<UserListItem>> {
         return this.usersService.getUserList();
     }
-    
+    @Get('Owners/all')
+    async getOwners(): Promise<ArrayReturn<UserListItem>> {
+        return this.usersService.getOwners();
+    }
     @Put('disable/:id')
     async disableUser(@Param('id') userId: string): Promise<StatusDTO> {
         return this.usersService.disableUser(userId);

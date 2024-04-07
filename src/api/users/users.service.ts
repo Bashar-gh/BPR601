@@ -35,6 +35,12 @@ export class UsersService {
     };
 
   }
+  async getOwners(): Promise<ArrayReturn<UserListItem>> {
+    let data = await this.userModel.find({ type: Role.Owner }).exec();
+    return {
+      ARRAY: data.map(mapUserListItem),
+    };
+  }
   async findById(id: string): Promise<User> {
 
     let data = await this.userModel.findById(id).exec();
