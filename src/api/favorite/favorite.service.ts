@@ -39,6 +39,15 @@ export class FavoriteService {
 
         return { Status: result.deletedCount == 1 };
     }
+
+    async serviceDeleted(serviceId: string): Promise<StatusDTO> {
+        await this.favoriteModel.deleteMany({ serviceId: serviceId.toObjectID() });
+        return { Status: true };
+    }
+    async sideOrderDeleted(sideOrderId: string): Promise<StatusDTO> {
+        await this.favoriteModel.deleteMany({ sideOrderId: sideOrderId.toObjectID() });
+        return { Status: true };
+    }
     async getFavorites(userId: string): Promise<MyFavorites> {
         let query = this.favoriteModel.find({ userId: userId.toObjectID() });
         query.populate("serviceId");
@@ -47,12 +56,12 @@ export class FavoriteService {
         return mapMyFavorites(data);
     }
     async getUsersFavorited(serviceId?: string, sideOrderId?: string): Promise<ArrayReturn<UserListItem>> {
-        let find:any = {};
-        if(serviceId){
-            find.serviceId =serviceId.toObjectID();
+        let find: any = {};
+        if (serviceId) {
+            find.serviceId = serviceId.toObjectID();
         }
-        if(sideOrderId){
-            find.sideOrderId =sideOrderId.toObjectID();
+        if (sideOrderId) {
+            find.sideOrderId = sideOrderId.toObjectID();
         }
         let query = this.favoriteModel.find(find);
         query.populate("userId");

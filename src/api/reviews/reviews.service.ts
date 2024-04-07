@@ -60,6 +60,20 @@ export class ReviewsService {
             Status: status,
         };
     }
+    async serviceDeleted(id: string): Promise<StatusDTO> {
+       await this.reviewModel.deleteMany({serviceId:id.toObjectID()});
+
+         return {
+             Status: true,
+         };
+     }
+     async sideOrderDeleted(id: string): Promise<StatusDTO> {
+        await this.reviewModel.deleteMany({sideOrderId:id.toObjectID()});
+ 
+          return {
+              Status: true,
+          };
+      }
     async editReview(id: string, dto: CreateReviewDTO): Promise<StatusDTO> {
         let result = await this.reviewModel.findByIdAndUpdate(id, {
             rating: dto.rating,

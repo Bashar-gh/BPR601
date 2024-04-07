@@ -9,6 +9,9 @@ import NotFound from 'src/global/errors/not_found.error';
 import { ArrayReturn } from 'src/global/models/dtos/return_type.dto';
 import '../../global/extensions/string.extensions';
 import { StatusDTO } from 'src/global/models/dtos/status.dto';
+import { ReservationsService } from '../reservations/reservations.service';
+import { FavoriteService } from '../favorite/favorite.service';
+import { ReviewsService } from '../reviews/reviews.service';
 type SideOrderPrice = Pick<SideOrder, 'price' | 'id'>;
 @Injectable()
 export class SideordersService {

@@ -83,7 +83,7 @@ export class ReservationsService {
         };
     }
     async getAll(): Promise<ArrayReturn<ReservationListItem>> {
-        let query = this.reservationModel.find( );
+        let query = this.reservationModel.find();
         query.populate('userId');
         query.populate('reservableId');
         let reservations = await query.exec();
@@ -181,10 +181,33 @@ export class ReservationsService {
         };
     }
     async cancelReservation(id: string): Promise<StatusDTO> {
-        await this.reservationModel.findByIdAndDelete(id);
+        await this.reservationModel.findByIdAndDelete(id).exec();
         return { Status: true };
     }
-    
+    async serviceDeleted(id: string): Promise<StatusDTO> {
+        await this.reservationModel.deleteMany({ reservableId: id.toObjectID() }).exec();
+        return { Status: true };
+    }
+    async sideOrderDeleted(id: string): Promise<StatusDTO> {
+        let reservations = await this.reservationModel.find({ "sideOrders.sideOrderId": id.toObjectID() }).exec();
+        for (let i = 0; i < reservations.length; i++) {
+            const reservation = reservations[i];
+            let order = reservation.sideOrders.find((e) => e.sideOrderId.toString() == id.toString()) ?? { count: 0, price: 0 };
+            let discount = order.count * order.price;
+            let newPrice = reservation.price = discount;
+            await this.reservationModel.findByIdAndUpdate(reservation.id, {
+                price: newPrice
+            });
+
+        }
+        await this.reservationModel.updateMany({ "sideOrders.sideOrderId": id.toObjectID() },
+            {
+                $pull: { sideOrders: { sideOrderId: id.toObjectID() } }
+            }).exec();
+
+        return { Status: true };
+    }
+
     private async getReservationsForDay(serviceId: string, day: Date): Promise<Reservation[]> {
         return this.reservationModel.find({
             reservableId: serviceId.toObjectID(),

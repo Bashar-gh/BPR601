@@ -44,11 +44,7 @@ export class ReservableController {
         let payload: JWT_Data = request.payload;
         return this.reservableService.create(dto, payload.userId);
     }
-    @Roles(Role.Admin)
-    @Delete(":id")
-    async deleteService(@Param("id") id: String): Promise<StatusDTO> {
-        return this.reservableService.deleteService(id);
-    }
+    
     @Roles(Role.Admin)
     @Get("")
     async getAll(): Promise<ArrayReturn<ReservableListItem>> {

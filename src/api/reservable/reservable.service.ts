@@ -10,6 +10,9 @@ import NotFound from 'src/global/errors/not_found.error';
 import '../../global/extensions/string.extensions';
 import { ArrayReturn } from 'src/global/models/dtos/return_type.dto';
 import { StatusDTO } from 'src/global/models/dtos/status.dto';
+import { ReservationsService } from '../reservations/reservations.service';
+import { FavoriteService } from '../favorite/favorite.service';
+import { ReviewsService } from '../reviews/reviews.service';
 
 @Injectable()
 export class ReservableService {
@@ -80,7 +83,7 @@ export class ReservableService {
     return mapReservableDetails(data);
   }
 
-  async deleteService(id: String): Promise<StatusDTO> {
+  async deleteService(id: string): Promise<StatusDTO> {
     await this.reservableModel.findByIdAndDelete(id);
     return { Status: true };
   }

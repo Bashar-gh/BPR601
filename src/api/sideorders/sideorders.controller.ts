@@ -38,11 +38,8 @@ export class SideordersController {
     async getAll(): Promise<ArrayReturn<SideOrderListItem>> {
         return this.sideOrderService.getAll();
     }
+    
     @Roles(Role.Admin)
-    @Delete(':id')
-    async deleteSideOrder(@Param("id") id: string): Promise<StatusDTO> {
-        return this.sideOrderService.deleteSideOrder(id);
-    } @Roles(Role.Admin)
     @Put(':id')
     async update(@Param("id") id: string, @Body() dto: CreateSideOrderDTO, @Query('ownerId') ownerId?: string): Promise<SideOrderDetails> {
         return this.sideOrderService.update(id, dto, ownerId);

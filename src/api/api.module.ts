@@ -6,6 +6,7 @@ import { ReservableModule } from './reservable/reservable.module';
 import { SideordersModule } from './sideorders/sideorders.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { FavoriteModule } from './favorite/favorite.module';
+import { RoleBackModule } from './role-back/role-back.module';
 
 
 @Module({
@@ -18,6 +19,7 @@ import { FavoriteModule } from './favorite/favorite.module';
         SideordersModule,
         ReviewsModule,
         FavoriteModule,
+        RoleBackModule,
       
     ],
     
