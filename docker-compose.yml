@@ -6,8 +6,11 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
+      
     environment:
       - PORT=${PORT}
+    env_file:
+      - .env.production
     ports:
       - '3000:3000'
     
