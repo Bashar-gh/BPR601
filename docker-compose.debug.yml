@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   bimserver:
-    image: bimserver
+    image: ontime
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -10,7 +10,5 @@ services:
       - PORT=${PORT}
     ports:
       - '3000:3000'
-    depends_on:
-      - db
     volumes:
       - ./src:/app/src
